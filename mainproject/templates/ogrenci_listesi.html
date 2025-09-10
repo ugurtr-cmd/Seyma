@@ -1,0 +1,997 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Öğrenci Yönetimi | Şeyma{% endblock %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #2e59d9;
+        --secondary-color: #6f42c1;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-bg: #f8f9fc;
+        --text-dark: #333333;
+        --text-light: #6c757d;
+        --border-color: #e3e6f0;
+        --transition: all 0.3s ease;
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+        background-color: var(--light-bg);
+        min-height: calc(100vh - 70px);
+    }
+    .btn-excel {
+        background: linear-gradient(135deg, #1d6f42, #166534);
+        color: white;
+    }
+
+    .btn-excel:hover {
+        background: linear-gradient(135deg, #166534, #1d6f42);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(29, 111, 66, 0.25);
+}
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .page-title {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid var(--border-color);
+        transition: var(--transition);
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-desc {
+        color: var(--text-dark);
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    
+    .analytics-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 2rem;
+    }
+    
+    .analytics-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .analytics-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 0;
+    }
+    
+    .chart-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .chart-card {
+        background: var(--light-bg);
+        border-radius: 10px;
+        padding: 1.2rem;
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .chart-title {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Grafikler için responsive düzenlemeler */
+    .chart-card canvas {
+        max-width: 100%;
+        height: auto !important;
+    }
+    
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 1rem;
+        align-items: end;
+    }
+    
+    .form-group {
+        margin-bottom: 0;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+    
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        height: fit-content;
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, var(--success-color), #17a673);
+        color: white;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(28, 200, 138, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.25);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--text-light), #6c757d);
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(108, 117, 125, 0.25);
+    }
+    
+    .add-student-form {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    
+    .add-student-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .add-student-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 0;
+    }
+    
+    .add-student-content {
+        display: none;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .add-student-content.show {
+        display: grid;
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 1rem 0.75rem;
+        font-weight: 600;
+        text-align: left;
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+    
+    .table tbody td {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+    }
+    
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(78, 115, 223, 0.05);
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+    
+    .btn-sm {
+        padding: 0.35rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-info {
+        background: linear-gradient(135deg, var(--info-color), #2a96a5);
+        color: white;
+    }
+    
+    .btn-info:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(54, 185, 204, 0.25);
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, var(--warning-color), #f4b619);
+        color: #fff;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(246, 194, 62, 0.25);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, var(--danger-color), #d52a1a);
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(231, 74, 59, 0.25);
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background-color: #e6f4ee;
+        color: var(--success-color);
+    }
+    
+    .badge-warning {
+        background-color: #fef5e6;
+        color: var(--warning-color);
+    }
+    
+    .badge-info {
+        background-color: #e6f0f2;
+        color: var(--info-color);
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        padding: 1rem;
+        gap: 0.5rem;
+    }
+    
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .page-link:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .page-link.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    /* Profil Fotoğrafı Stilleri */
+    .profile-image-container {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e9ecef;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .profile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .profile-image-placeholder {
+        color: #858796;
+        font-size: 1.2rem;
+    }
+    
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .student-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    
+    .student-notes {
+        font-size: 0.8rem;
+        color: #413a3aff;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .filter-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .chart-container {
+            grid-template-columns: 1fr;
+        }
+        
+        /* Grafikler için özel mobil düzenlemeler */
+        .chart-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-card canvas {
+            max-height: 250px !important;
+            width: 100% !important;
+        }
+        
+        .btn {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .add-student-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+        
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+        }
+        
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: left;
+        }
+        
+        .table tbody td:last-child {
+            border-bottom: none;
+        }
+        
+        .btn-group {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Mobil için profil görüntüsü düzenlemeleri */
+        .student-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .profile-image-container {
+            width: 35px;
+            height: 35px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .main-content {
+            padding: 0.75rem;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+        }
+        
+        /* Daha küçük ekranlar için grafik ayarları */
+        .analytics-section {
+            padding: 1rem;
+        }
+        
+        .chart-card {
+            padding: 0.75rem;
+        }
+        
+        .chart-card canvas {
+            max-height: 200px !important;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+        
+        .btn-sm {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table tbody td {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+        
+        .table tbody td::before {
+            margin-bottom: 0.25rem;
+        }
+    }
+    
+    /* Empty state */
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-light);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--border-color);
+    }
+    
+    .empty-state p {
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Sayfa Başlığı -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-user-graduate"></i> Öğrenci Yönetimi
+        </h1>
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'yeni_ogrenci' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Yeni Öğrenci
+            </a>
+            <a href="{% url 'export_ogrenci_listesi_excel' %}?{{ request.GET.urlencode }}" class="btn btn-primary">
+                <i class="fas fa-file-excel"></i> Excel'e Aktar
+            </a>
+        </div>
+    </div>
+    
+    <!-- İstatistik Kartları -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ ogrenciler.paginator.count }}</div>
+            <div class="stat-label">Toplam Öğrenci</div>
+            <div class="stat-desc">Sistemde kayıtlı</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value">{{ sinif_ortalamasi|floatformat:1 }}</div>
+            <div class="stat-label">Sınıf Ortalaması</div>
+            <div class="stat-desc">Tüm sınavların ortalaması</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value">{% if en_basarili_ogrenci %}{{ en_basarili_ogrenci.ad_soyad|truncatewords:1 }}{% else %}Yok{% endif %}</div>
+            <div class="stat-label">En Başarılı Öğrenci</div>
+            <div class="stat-desc">{% if en_basarili_ogrenci %}{{ en_basarili_ogrenci.ders_ortalamasi|floatformat:1 }} ortalama{% else %}Veri yok{% endif %}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-value">{{ toplam_tamamlanan_ezber }}</div>
+            <div class="stat-label">Tamamlanan Ezber</div>
+            <div class="stat-desc">Toplam tamamlanan sure</div>
+        </div>
+    </div>
+    
+    <!-- Analiz Grafikleri -->
+    <div class="analytics-section">
+        <div class="analytics-header">
+            <h3 class="analytics-title"><i class="fas fa-chart-bar"></i> Sınıf Analizleri</h3>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-card">
+                <h4 class="chart-title"><i class="fas fa-chart-pie"></i> Seviye Dağılımı</h4>
+                <canvas id="seviyeDagilimChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <h4 class="chart-title"><i class="fas fa-chart-line"></i> Başarı Ortalamaları</h4>
+                <canvas id="basariOrtalamalariChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <h4 class="chart-title"><i class="fas fa-trophy"></i> En Başarılı 5 Öğrenci</h4>
+                <canvas id="enBasariliOgrencilerChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtreleme ve Arama -->
+    <div class="filter-section">
+        <form method="GET" action="{% url 'ogrenci_listesi' %}">
+            <div class="filter-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-search"></i> İsimle Ara
+                    </label>
+                    <input type="text" class="form-control" name="q" value="" placeholder="Öğrenci adı ara...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-layer-group"></i> Seviye Filtrele
+                    </label>
+                    <select class="form-control" name="seviye">
+                        <option value="">Tüm Seviyeler</option>
+                        {% for value, label in seviyeler %}
+                        <option value="{{ value }}" {% if seviye_filtre == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Filtrele
+                    </button>
+                    <a href="{% url 'ogrenci_listesi' %}" class="btn btn-secondary">
+                        <i class="fas fa-sync"></i> Sıfırla
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Öğrenci Listesi -->
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Öğrenci</th>
+                    <th>Sınav Ort.</th>
+                    <th>Ezber Durumu</th>
+                    <th>Seviye</th>
+                    <th>Kayıt Tarihi</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ogrenci in ogrenciler %}
+                <tr>
+                    <td data-label="Öğrenci">
+                        <div class="student-info">
+                            <div class="profile-image-container">
+                                {% if ogrenci.profil_foto %}
+                                <img src="{{ ogrenci.profil_foto.url }}" alt="{{ ogrenci.ad_soyad }}" class="profile-image">
+                                {% else %}
+                                <div class="profile-image-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="student-details">
+                                <span class="student-name">{{ ogrenci.ad_soyad }}</span>
+                                {% if ogrenci.ozel_notlar %}
+                                <span class="student-notes">{{ ogrenci.ozel_notlar|truncatewords:5 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Sınav Ort.">
+                        <span class="badge {% if ogrenci.ders_ortalamasi >= 85 %}badge-success{% elif ogrenci.ders_ortalamasi >= 70 %}badge-info{% else %}badge-warning{% endif %}">
+                            {{ ogrenci.ders_ortalamasi|floatformat:1 }}
+                        </span>
+                    </td>
+                    <td data-label="Ezber Durumu">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; background-color: #e9ecef; height: 8px; border-radius: 4px;">
+                                <div style="height: 100%; width: {% widthratio ogrenci.tamamlanan_ezber_sayisi 13 100 %}%; background-color: 
+                                    {% if ogrenci.tamamlanan_ezber_sayisi >= 10 %}var(--success-color)
+                                    {% elif ogrenci.tamamlanan_ezber_sayisi >= 7 %}var(--info-color)
+                                    {% else %}var(--warning-color){% endif %}; border-radius: 4px;">
+                                </div>
+                            </div>
+                            <span style="font-size: 0.85rem; font-weight: 600;">{{ ogrenci.tamamlanan_ezber_sayisi }}/13</span>
+                        </div>
+                    </td>
+                    <td data-label="Seviye">
+                        <span class="badge 
+                            {% if ogrenci.seviye == 'ILERI' %}badge-success
+                            {% elif ogrenci.seviye == 'TEMEL' %}badge-info
+                            {% elif ogrenci.seviye == 'HAZ3' %}badge-warning
+                            {% elif ogrenci.seviye == 'HAZ2' %}badge-warning
+                            {% elif ogrenci.seviye == 'HAZ1' %}badge-warning
+                            {% else %}badge-warning{% endif %}">
+                            {{ ogrenci.get_seviye_display }}
+                        </span>
+                    </td>
+                    <td data-label="Kayıt Tarihi">
+                        {{ ogrenci.kayit_tarihi|date:"d.m.Y" }}
+                    </td>
+                    <td data-label="İşlemler">
+                        <div class="btn-group">
+                            <a href="{% url 'ogrenci_detay' ogrenci.id %}" class="btn-sm btn-info">
+                                <i class="fas fa-eye"></i> Detay
+                            </a>
+                            <a href="{% url 'ogrenci_duzenle' ogrenci.id %}" class="btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Düzenle
+                            </a>
+                            <a href="{% url 'ogrenci_sil' ogrenci.id %}" class="btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Sil
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-user-graduate"></i>
+                        <p>Henüz hiç öğrenci kaydı bulunmamaktadır.</p>
+                        <a href="{% url 'yeni_ogrenci' %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> İlk Öğrenciyi Ekle
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Sayfalama -->
+    {% if ogrenciler.has_other_pages %}
+    <div class="pagination">
+        {% if ogrenciler.has_previous %}
+            <a href="?sayfa={{ ogrenciler.previous_page_number }}{% if arama_terimi %}&q={{ arama_terimi }}{% endif %}{% if seviye_filtre %}&seviye={{ seviye_filtre }}{% endif %}" class="page-link">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        {% endif %}
+        
+        {% for i in ogrenciler.paginator.page_range %}
+            {% if ogrenciler.number == i %}
+                <a href="#" class="page-link active">{{ i }}</a>
+            {% else %}
+                <a href="?sayfa={{ i }}{% if arama_terimi %}&q={{ arama_terimi }}{% endif %}{% if seviye_filtre %}&seviye={{ seviye_filtre }}{% endif %}" class="page-link">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if ogrenciler.has_next %}
+            <a href="?sayfa={{ ogrenciler.next_page_number }}{% if arama_terimi %}&q={{ arama_terimi }}{% endif %}{% if seviye_filtre %}&seviye={{ seviye_filtre }}{% endif %}" class="page-link">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Grafikleri oluştur
+        createCharts();
+        
+        function createCharts() {
+            // Seviye Dağılımı Grafiği
+            const seviyeCtx = document.getElementById('seviyeDagilimChart');
+            if (seviyeCtx) {
+                new Chart(seviyeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Hazırlık 1', 'Hazırlık 2', 'Hazırlık 3', 'Temel', 'İleri', 'Hafızlık'],
+                        datasets: [{
+                            data: [
+                                {{ seviye_dagilimi.HAZ1 }},
+                                {{ seviye_dagilimi.HAZ2 }},
+                                {{ seviye_dagilimi.HAZ3 }},
+                                {{ seviye_dagilimi.TEMEL }},
+                                {{ seviye_dagilimi.ILERI }},
+                                {{ seviye_dagilimi.HAFIZLIK }}
+                            ],
+                            backgroundColor: [
+                                'rgba(78, 115, 223, 0.7)',
+                                'rgba(54, 185, 204, 0.7)',
+                                'rgba(246, 194, 62, 0.7)',
+                                'rgba(28, 200, 138, 0.7)',
+                                'rgba(133, 135, 150, 0.7)',
+                                'rgba(231, 74, 59, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(78, 115, 223, 1)',
+                                'rgba(54, 185, 204, 1)',
+                                'rgba(246, 194, 62, 1)',
+                                'rgba(28, 200, 138, 1)',
+                                'rgba(133, 135, 150, 1)',
+                                'rgba(231, 74, 59, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Başarı Ortalamaları Grafiği
+            const basariCtx = document.getElementById('basariOrtalamalariChart');
+            if (basariCtx) {
+                new Chart(basariCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [{% for ders, ortalama in ders_ortalamalari.items %}'{{ ders }}',{% endfor %}],
+                        datasets: [{
+                            label: 'Ortalama Puan',
+                            data: [{% for ders, ortalama in ders_ortalamalari.items %}{{ ortalama|floatformat:1 }},{% endfor %}],
+                            backgroundColor: 'rgba(78, 115, 223, 0.7)',
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Ortalama Puan'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // En Başarılı 5 Öğrenci Grafiği
+            const basariliOgrencilerCtx = document.getElementById('enBasariliOgrencilerChart');
+            if (basariliOgrencilerCtx) {
+                const ogrenciIsimleri = [];
+                const ogrenciOrtalamalari = [];
+                
+                {% for ogrenci, ortalama in en_basarili_5_ogrenci %}
+                    ogrenciIsimleri.push('{{ ogrenci.ad_soyad|truncatewords:1 }}');
+                    ogrenciOrtalamalari.push({{ ortalama|floatformat:1 }});
+                {% endfor %}
+                
+                // Eğer veri yoksa, grafiği göstermemek için
+                if (ogrenciIsimleri.length === 0) {
+                    ogrenciIsimleri.push('Veri yok');
+                    ogrenciOrtalamalari.push(0);
+                }
+                
+                new Chart(basariliOgrencilerCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ogrenciIsimleri,
+                        datasets: [{
+                            label: 'Ortalama Puan',
+                            data: ogrenciOrtalamalari,
+                            backgroundColor: 'rgba(28, 200, 138, 0.7)',
+                            borderColor: 'rgba(28, 200, 138, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Ortalama Puan'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
+{% endblock %}

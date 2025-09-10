@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block page_title %}ŞEYMA - Hakkımda {% endblock %}
+
+{% block css_file %} 
+<link rel="stylesheet" href="{% static 'mainproject/css/style.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .about-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+    .about-card:hover {
+        transform: translateY(-5px);
+    }
+    .vision-item {
+        border-left: 3px solid #4e73df;
+        padding-left: 15px;
+        margin-bottom: 10px;
+    }
+    .education-card {
+        border: none;
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+    .education-card:hover {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="about-card bg-white p-4 p-md-5 mb-5">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center mb-4 mb-md-0">
+                        <img src="{% static 'blog/img/profil.jpg' %}" class="img-fluid rounded-circle shadow" alt="Şeyma" style="max-width: 200px;">
+                    </div>
+                    <div class="col-md-8">
+                        <h2 class="text-primary mb-3">Merhaba, Ben Şeyma</h2>
+                        <p class="lead">Kur'an-ı Kerim öğretmeni ve hafız olarak, öğrencilerime Allah'ın kelamını en doğru şekilde öğretmeyi ve İslami değerleri aktarmayı kendime görev edindim.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="h-100 p-4 bg-light rounded">
+                        <h4 class="text-center mb-4 text-primary"><i class="fas fa-bullseye me-2"></i>Vizyonum</h4>
+                        <div class="vision-item">
+                            <h5><i class="fas fa-check-circle text-success me-2"></i>Kur'an'ı Anlamak</h5>
+                            <p>Kur'an'ı anlayarak okumayı yaygınlaştırmak</p>
+                        </div>
+                        <div class="vision-item">
+                            <h5><i class="fas fa-check-circle text-success me-2"></i>Sevgi Dolu Eğitim</h5>
+                            <p>Hafızlık eğitiminde kaliteli ve sevgi dolu bir yöntem</p>
+                        </div>
+                        <div class="vision-item">
+                            <h5><i class="fas fa-check-circle text-success me-2"></i>Bütünsel Başarı</h5>
+                            <p>Öğrencilerimin dünyevi ve uhrevi başarılarını desteklemek</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="h-100 p-4 bg-light rounded">
+                        <h4 class="text-center mb-4 text-primary"><i class="fas fa-book-open me-2"></i>Eğitimlerim</h4>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-quran text-primary me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Tecvidli Kur'an Okuma</h6>
+                                    <small class="text-muted">Doğru telaffuz ve kurallar</small>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-mosque text-success me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Hafızlık Hazırlık</h6>
+                                    <small class="text-muted">Profesyonel rehberlik</small>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-star text-warning me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Temel Dini Bilgiler</h6>
+                                    <small class="text-muted">İslami esaslar</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5 mb-4">
+                <div class="p-4 bg-primary text-white rounded">
+                    <h4><i class="fas fa-hands-helping me-2"></i>Siz de Bu Yolculuğa Katılmak İster misiniz?</h4>
+                    <p class="mb-4">"Rabbim ilmimi arttır." (Tâhâ 20:114)</p>
+                    <a href="{% url 'iletisim' %}" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-envelope me-2"></i>İletişime Geçin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

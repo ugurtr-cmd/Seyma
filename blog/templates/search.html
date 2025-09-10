@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% load static %}
+
+  {% block page_title %}ŞŞEYMA - Blog {% endblock %}
+
+  {% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/style.css' %}"> {% endblock %}
+
+
+  {% block content %}
+    <div class="container mt-5">
+      <h2 class="section-title">{{q}} Aramasının Sonuçları<h2>
+      <div class="row g-4">
+        <!-- Blog içerikleri buraya gelecektir -->
+    {% for yazi in yazilar %}
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{yazi.title}}</h5>
+              <p class="card-text">{{yazi.description|safe}}</p>
+              <a href="#" class="btn btn-outline-primary btn-sm">Devamını Oku</a>
+            </div>
+          </div>
+        </div>
+    {% endfor %}
+      {% if yazilar.paginator.num_pages > 1 %}
+          <nav aria-label="Page navigation example">
+            <ul class="pagination">
+              {% if yazilar.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{yazilar.previous_page_number}}">Geri</a></li>
+                {% else %}
+                <li class="page-item disabled"><a class="page-link" href="">Geri</a></li>
+              {% endif %}
+
+              {% for i in yazilar.paginator.page_range  %}
+                {% if yazilar.number == i %}
+                  <li class="page-item disabled"><a class="page-link" href="#">{{i}}</a></li>
+                {% else %}
+                  <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+
+                {% endif %}
+              {% endfor %}
+              {% if yazilar.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{yazilar.next_page_number}}">İleri</a></li>
+                {% else %}
+                <li class="page-item disabled"><a class="page-link" href="">İleri</a></li>
+              {% endif %}           
+             </ul>
+        </nav>
+      
+      {% endif %}
+
+  {% endblock %}

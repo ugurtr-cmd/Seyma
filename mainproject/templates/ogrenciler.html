@@ -1,0 +1,435 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Öğrenci Yönetimi | Şeyma{% endblock %}
+
+{% block css_file %}
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #2e59d9;
+        --secondary-color: #6f42c1;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-bg: #f8f9fc;
+        --text-dark: #5a5c69;
+        --text-light: #858796;
+        --border-color: #e3e6f0;
+        --transition: all 0.3s ease;
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+        background-color: var(--light-bg);
+        min-height: calc(100vh - 70px);
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .page-title {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 0;
+    }
+    
+    .section-box {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+    }
+    
+    .section-box:hover {
+        box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+    }
+    
+    .section-box h4 {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 0;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        height: calc(1.5em + 1rem + 2px);
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, var(--success-color), #17a673);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        height: calc(1.5em + 1rem + 2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(28, 200, 138, 0.25);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 1rem 0.75rem;
+        font-weight: 600;
+        text-align: left;
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+    
+    .table tbody td {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.9rem;
+    }
+    
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(78, 115, 223, 0.05);
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+    
+    .btn-sm {
+        padding: 0.35rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, var(--warning-color), #f4b619);
+        border: none;
+        color: #fff;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(246, 194, 62, 0.25);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, var(--danger-color), #d52a1a);
+        border: none;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(231, 74, 59, 0.25);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .section-box {
+            padding: 1.25rem;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .btn-success {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+        
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+        }
+        
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: left;
+        }
+        
+        .table tbody td:last-child {
+            border-bottom: none;
+        }
+        
+        .btn-group {
+            width: 100%;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .main-content {
+            padding: 0.75rem;
+        }
+        
+        .section-box {
+            padding: 1rem;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+        }
+        
+        .section-box h4 {
+            font-size: 1.1rem;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+        
+        .btn-sm {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table tbody td {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+        
+        .table tbody td::before {
+            margin-bottom: 0.25rem;
+        }
+    }
+    
+    /* Empty state */
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-light);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--border-color);
+    }
+    
+    .empty-state p {
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Sayfa Başlığı -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-graduation-cap"></i> Öğrenci Yönetimi
+        </h1>
+    </div>
+    
+    <!-- Öğrenci Ekleme Formu -->
+    <div class="section-box">
+        <h4><i class="fas fa-user-plus"></i> Yeni Öğrenci Ekle</h4>
+        
+        <form class="form-row">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user"></i> Ad Soyad
+                </label>
+                <input type="text" class="form-control" placeholder="Öğrenci adı ve soyadı">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-star"></i> Not
+                </label>
+                <input type="number" class="form-control" placeholder="0-100" min="0" max="100">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-chart-line"></i> Puan
+                </label>
+                <input type="number" class="form-control" placeholder="0-10" min="0" max="10" step="0.1">
+            </div>
+            
+            <div class="form-group">
+                <button class="btn btn-success">
+                    <i class="fas fa-plus"></i> Öğrenci Ekle
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Öğrenci Listesi -->
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Ad Soyad</th>
+                    <th>Not</th>
+                    <th>Puan</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-label="Ad Soyad">
+                        <strong>Ahmet Demir</strong>
+                    </td>
+                    <td data-label="Not">85</td>
+                    <td data-label="Puan">92</td>
+                    <td data-label="İşlemler">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Düzenle
+                            </button>
+                            <button class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Sil
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td data-label="Ad Soyad">
+                        <strong>Elif Kaya</strong>
+                    </td>
+                    <td data-label="Not">90</td>
+                    <td data-label="Puan">95</td>
+                    <td data-label="İşlemler">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Düzenle
+                            </button>
+                            <button class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Sil
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td data-label="Ad Soyad">
+                        <strong>Mehmet Yılmaz</strong>
+                    </td>
+                    <td data-label="Not">78</td>
+                    <td data-label="Puan">88</td>
+                    <td data-label="İşlemler">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Düzenle
+                            </button>
+                            <button class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Sil
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

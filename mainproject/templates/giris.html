@@ -1,0 +1,511 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Giriş Yap | Şeyma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4e73df;
+      --primary-dark: #3a56c4;
+      --accent-color: #ff6b6b;
+      --text-color: #2d3748;
+      --text-light: #718096;
+      --light-bg: #f8f9fa;
+      --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .login-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .login-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .login-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .login-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .login-subtitle {
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-control {
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      transition: var(--transition);
+      background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      z-index: 5;
+    }
+    
+    .form-control.with-icon {
+      padding-left: 3rem;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      z-index: 5;
+    }
+    
+    .password-toggle:hover {
+      color: var(--primary-color);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: var(--transition);
+      width: 100%;
+      margin-top: 1rem;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(78, 115, 223, 0.3);
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    /* Hata mesajı için yeni stil */
+    .error-container {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: slideInDown 0.5s ease-out;
+    }
+    
+    .error-container i {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    
+    .error-message {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    .login-footer {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    
+    .login-footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .login-footer a:hover {
+      color: var(--primary-dark);
+      transform: translateX(5px);
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      
+      .login-container {
+        max-width: 400px;
+      }
+      
+      .login-box {
+        padding: 2rem;
+      }
+      
+      .login-logo {
+        font-size: 2.2rem;
+      }
+      
+      .login-title {
+        font-size: 1.6rem;
+      }
+      
+      .error-container {
+        padding: 0.875rem 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      .login-box {
+        padding: 1.5rem;
+        border-radius: 16px;
+      }
+      
+      .login-logo {
+        font-size: 2rem;
+      }
+      
+      .login-title {
+        font-size: 1.4rem;
+      }
+      
+      .login-subtitle {
+        font-size: 0.9rem;
+      }
+      
+      .form-control {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.95rem;
+      }
+      
+      .btn-primary {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+      }
+      
+      .input-icon {
+        left: 0.875rem;
+      }
+      
+      .form-control.with-icon {
+        padding-left: 2.75rem;
+      }
+      
+      .error-container {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (max-width: 360px) {
+      .login-box {
+        padding: 1.25rem;
+      }
+      
+      .login-logo {
+        font-size: 1.8rem;
+      }
+      
+      .login-title {
+        font-size: 1.3rem;
+      }
+      
+      .form-control {
+        padding: 0.675rem 0.75rem;
+      }
+      
+      .input-icon {
+        left: 0.75rem;
+      }
+      
+      .form-control.with-icon {
+        padding-left: 2.5rem;
+      }
+      
+      .error-container {
+        padding: 0.625rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <!-- Header -->
+      <div class="login-header">
+        <span class="login-logo">Şeyma</span>
+        <h1 class="login-title">Giriş Yap</h1>
+        <p class="login-subtitle">Yönetim paneline erişmek için giriş yapın</p>
+      </div>
+
+      <!-- Hata Mesajları - Django messages framework için -->
+      {% if messages %}
+          <div class="error-container">
+            <i class="fas fa-exclamation-circle"></i>
+            <p class="error-message">Kullanıcı adı veya parola hatalı</p>
+          </div>
+      {% endif %}
+
+
+      <!-- Login Form -->
+      <form method="POST">
+        {% csrf_token %}
+
+        <!-- E-posta Alanı -->
+        <div class="mb-3">
+          <label for="username" class="form-label">
+            <i class="fas fa-envelope"></i>
+            Kullanıcı Adı
+          </label>
+          <div class="input-group">
+            <input type="text" name="username" class="form-control with-icon" id="username" 
+                   placeholder="kullaniciadi" required>
+          </div>
+        </div>
+
+        <!-- Şifre Alanı -->
+        <div class="mb-3">
+          <label for="password" class="form-label">
+            <i class="fas fa-lock"></i>
+            Şifre
+          </label>
+          <div class="input-group">
+            <input type="password" name="password" class="form-control with-icon" id="password" 
+                   placeholder="•••••••" required>
+            <button type="button" class="password-toggle" id="passwordToggle">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Giriş Butonu -->
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          Giriş Yap
+        </button>
+      </form>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        &copy; 2025 Şeyma | Tüm hakları saklıdır.
+        <br>
+        <a href="/">
+          <i class="fas fa-arrow-left me-1"></i>
+          Siteye geri dön
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Şifre göster/gizle
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('password');
+    
+    passwordToggle.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      // İkon değiştirme
+      const icon = this.querySelector('i');
+      if (type === 'text') {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    });
+    
+    // Hata durumunda formu salla
+    {% if messages or error %}
+      const form = document.querySelector('form');
+      form.classList.add('shake');
+      setTimeout(() => {
+        form.classList.remove('shake');
+      }, 400);
+    {% endif %}
+    
+    // Inputlara otomatik odaklan
+    setTimeout(() => {
+      const usernameInput = document.getElementById('username');
+      if (usernameInput && !usernameInput.value) {
+        usernameInput.focus();
+      }
+    }, 300);
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+      const inputs = this.querySelectorAll('input[required]');
+      let isValid = true;
+      
+      inputs.forEach(input => {
+        if (!input.value.trim()) {
+          isValid = false;
+          input.classList.add('is-invalid');
+        } else {
+          input.classList.remove('is-invalid');
+        }
+      });
+      
+      if (!isValid) {
+        e.preventDefault();
+        this.classList.add('shake');
+        setTimeout(() => {
+          this.classList.remove('shake');
+        }, 400);
+      }
+    });
+    
+    // Input hata durumlarını temizle
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+      });
+    });
+  });
+  </script>
+</body>
+</html>

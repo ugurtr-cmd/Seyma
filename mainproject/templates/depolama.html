@@ -1,0 +1,50 @@
+{% extends "layout_admin.html" %}
+
+{% load static %}
+{% block title %}Öğrenciler | Şeyma {% endblock title %} 
+{% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">{% endblock css_file %}
+{% block content %}
+    <!-- Main Content -->
+    <div class="main-panel">
+
+      <!-- Bulut Depolama -->
+      <div class="section-box">
+        <h4>📂 Bulut Depolama</h4>
+        <form class="mb-3">
+          <input type="file" class="form-control">
+          <button class="btn btn-secondary mt-2">Yükle</button>
+        </form>
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Dosya Adı</th>
+              <th>Boyut</th>
+              <th>İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ders1.mp4</td>
+              <td>120MB</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary">İndir</button>
+                <button class="btn btn-sm btn-outline-danger">Sil</button>
+              </td>
+            </tr>
+            <tr>
+              <td>notlar.pdf</td>
+              <td>2MB</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary">İndir</button>
+                <button class="btn btn-sm btn-outline-danger">Sil</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+
+{% endblock content %}

@@ -1,0 +1,308 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Parola Güncelle | Şeyma{% endblock %}
+
+{% block css_file %}
+<style>
+  .main-content {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px);
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  }
+  
+  .password-container {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .password-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .password-header h2 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+  
+  .password-header p {
+    color: var(--text-dark);
+    font-weight: 500;
+  }
+  
+  .security-note {
+    background: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+  }
+  
+  .security-note p {
+    color: var(--text-dark);
+    margin: 0;
+    font-weight: 500;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.8rem;
+    display: block;
+  }
+  
+  .form-control {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+    width: 100%;
+  }
+  
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: var(--transition);
+    width: 100%;
+    color: white;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(78, 115, 223, 0.3);
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50px;
+    cursor: pointer;
+    color: var(--text-dark);
+  }
+  
+  .password-strength {
+    height: 5px;
+    border-radius: 3px;
+    margin-top: 0.5rem;
+    background: #e9ecef;
+    overflow: hidden;
+  }
+  
+  .password-strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 3px;
+  }
+  
+  .password-hints {
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+  
+  @media (max-width: 576px) {
+    .password-container {
+      padding: 2rem 1.5rem;
+    }
+    
+    .main-content {
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="password-container">
+    <div class="password-header">
+      <h2><i class="fas fa-lock"></i> Parola Güncelleme</h2>
+      <p>Hesap güvenliğiniz için parolanızı düzenli aralıklarla güncellemeniz önerilir.</p>
+    </div>
+    
+    <div class="security-note">
+      <p><i class="fas fa-info-circle me-2"></i> Parolanız en az 8 karakter uzunluğunda olmalı ve tamamen sayısal olamaz.</p>
+    </div>
+    
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        Lütfen aşağıdaki hataları düzeltin:
+        {% for field in form %}
+          {% for error in field.errors %}
+            <div><strong>{{ field.label }}:</strong> {{ error }}</div>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <div>{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <form method="POST" id="passwordForm">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="id_old_password" class="form-label">
+          <i class="fas fa-key"></i> Eski Parola
+        </label>
+        <input type="password" name="old_password" class="form-control" id="id_old_password" placeholder="Mevcut parolanızı girin" required>
+        <span class="password-toggle" id="toggleOldPassword">
+          <i class="fas fa-eye"></i>
+        </span>
+      </div>
+      
+      <div class="form-group">
+        <label for="id_new_password1" class="form-label">
+          <i class="fas fa-lock"></i> Yeni Parola
+        </label>
+        <input type="password" name="new_password1" class="form-control" id="id_new_password1" placeholder="Yeni parolanızı girin" required>
+        <span class="password-toggle" id="toggleNewPassword">
+          <i class="fas fa-eye"></i>
+        </span>
+        <div class="password-strength">
+          <div class="password-strength-bar" id="passwordStrengthBar"></div>
+        </div>
+        <div class="password-hints" id="passwordHints">
+          Şifreniz en az 8 karakter uzunluğunda olmalı ve tamamen sayısal olamaz.
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="id_new_password2" class="form-label">
+          <i class="fas fa-lock"></i> Yeni Parola (Tekrar)
+        </label>
+        <input type="password" name="new_password2" class="form-control" id="id_new_password2" placeholder="Yeni parolanızı tekrar girin" required>
+        <span class="password-toggle" id="toggleConfirmPassword">
+          <i class="fas fa-eye"></i>
+        </span>
+        <div id="passwordMatch" class="password-hints"></div>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-sync-alt me-2"></i> Parolayı Güncelle
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Şifre göster/gizle fonksiyonları
+  function setupPasswordToggle(toggleId, inputId) {
+    const toggle = document.getElementById(toggleId);
+    const input = document.getElementById(inputId);
+    
+    toggle.addEventListener('click', function() {
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+      } else {
+        input.type = 'password';
+        toggle.innerHTML = '<i class="fas fa-eye"></i>';
+      }
+    });
+  }
+  
+  setupPasswordToggle('toggleOldPassword', 'id_old_password');
+  setupPasswordToggle('toggleNewPassword', 'id_new_password1');
+  setupPasswordToggle('toggleConfirmPassword', 'id_new_password2');
+  
+  // Şifre gücü kontrolü
+  const passwordInput = document.getElementById('id_new_password1');
+  const strengthBar = document.getElementById('passwordStrengthBar');
+  const passwordHints = document.getElementById('passwordHints');
+  const confirmPassword = document.getElementById('id_new_password2');
+  const passwordMatch = document.getElementById('passwordMatch');
+  
+  passwordInput.addEventListener('input', function() {
+    const password = passwordInput.value;
+    let strength = 0;
+    let hints = [];
+    
+    // Uzunluk kontrolü
+    if (password.length >= 8) strength += 25;
+    else hints.push('en az 8 karakter');
+    
+    // Büyük harf kontrolü
+    if (/[A-Z]/.test(password)) strength += 25;
+    else hints.push('büyük harf');
+    
+    // Küçük harf kontrolü
+    if (/[a-z]/.test(password)) strength += 25;
+    else hints.push('küçük harf');
+    
+    // Sayı veya özel karakter kontrolü
+    if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) strength += 25;
+    else hints.push('sayı veya özel karakter');
+    
+    // Güç çubuğunu güncelle
+    strengthBar.style.width = strength + '%';
+    
+    // Renkleri ayarla
+    if (strength < 50) {
+      strengthBar.style.backgroundColor = '#e74a3b'; // Kırmızı
+    } else if (strength < 75) {
+      strengthBar.style.backgroundColor = '#f6c23e'; // Sarı
+    } else {
+      strengthBar.style.backgroundColor = '#1cc88a'; // Yeşil
+    }
+    
+    // İpuçlarını güncelle
+    if (hints.length > 0) {
+      passwordHints.innerHTML = 'Şifrenizde şunlar eksik: ' + hints.join(', ');
+      passwordHints.style.color = '#e74a3b';
+    } else {
+      passwordHints.innerHTML = 'Şifreniz güçlü görünüyor!';
+      passwordHints.style.color = '#1cc88a';
+    }
+  });
+  
+  // Şifre eşleşme kontrolü
+  confirmPassword.addEventListener('input', function() {
+    if (passwordInput.value !== confirmPassword.value) {
+      passwordMatch.innerHTML = 'Şifreler eşleşmiyor!';
+      passwordMatch.style.color = '#e74a3b';
+    } else {
+      passwordMatch.innerHTML = 'Şifreler eşleşiyor.';
+      passwordMatch.style.color = '#1cc88a';
+    }
+  });
+});
+</script>
+{% endblock %}
