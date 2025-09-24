@@ -1,0 +1,11 @@
+{
+  "ogrenciler": "[{\"model\": \"mainproject.ogrenci\", \"pk\": 1, \"fields\": {\"ad_soyad\": \"Şeyma Ayday\", \"kayit_tarihi\": \"2025-09-10\", \"seviye\": \"HAZ1\", \"profil_foto\": \"\", \"ozel_notlar\": \"çok mükemmel\", \"son_guncelleme\": \"2025-09-10T19:32:42.076Z\"}}, {\"model\": \"mainproject.ogrenci\", \"pk\": 2, \"fields\": {\"ad_soyad\": \"Şeyma'M\", \"kayit_tarihi\": \"2025-09-10\", \"seviye\": \"HAZ1\", \"profil_foto\": \"\", \"ozel_notlar\": \"\", \"son_guncelleme\": \"2025-09-10T19:32:42.083Z\"}}]",
+  "yazilar": "[{\"model\": \"blog.yazi\", \"pk\": 1, \"fields\": {\"title\": \"TESTTESTTESTTESTTEST\", \"description\": \"<p>TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST</p>\\r\\n\", \"imageUrl\": \"\", \"date\": \"2025-09-10\", \"isActive\": false, \"slug\": \"testtesttesttesttest\", \"tarih\": \"2025-09-10T19:32:44.592Z\", \"category\": 1}}, {\"model\": \"blog.yazi\", \"pk\": 2, \"fields\": {\"title\": \"ŞEYMA'M ŞEYMA'M ŞEYMA'M ŞEYMA'M ŞEYMA'M ŞEYMA'M \", \"description\": \"<p>ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;ŞEYMA&#39;M&nbsp;</p>\\r\\n\", \"imageUrl\": \"\", \"date\": \"2025-09-10\", \"isActive\": true, \"slug\": \"seymam-seymam-seymam-seymam-seymam-seymam\", \"tarih\": \"2025-09-10T19:32:44.607Z\", \"category\": 1}}]",
+  "ezber_kayitlari": "[]",
+  "sinav_sonuclari": "[]",
+  "ders_notlari": "[]",
+  "alintilar": "[]",
+  "dersler": "[]",
+  "ezber_sureleri": "[]",
+  "backup_date": "2025-09-10T19:47:24.294801+00:00"
+}

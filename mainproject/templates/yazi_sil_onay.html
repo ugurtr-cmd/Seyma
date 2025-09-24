@@ -1,0 +1,26 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+{% block css_file %}
+    <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">
+{% endblock css_file %}
+{% block title %}Yazı Silme Onayı{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h4>Yazı Silme Onayı</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>"{{ yazi.title }}"</strong> başlıklı yazıyı silmek istediğinize emin misiniz?</p>
+            <p>Bu işlem geri alınamaz!</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                <a href="{% url 'admin-yazi-listesi' %}" class="btn btn-secondary">İptal</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

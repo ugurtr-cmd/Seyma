@@ -1,0 +1,1335 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Öğrenci Detayı | {{ ogrenci.ad_soyad }} | Şeyma{% endblock %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #2e59d9;
+        --secondary-color: #6f42c1;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-bg: #f8f9fc;
+        --text-dark: #333333;
+        --text-light: #6c757d;
+        --border-color: #e3e6f0;
+        --transition: all 0.3s ease;
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+        background-color: var(--light-bg);
+        min-height: calc(100vh - 70px);
+    }
+
+    .btn-excel {
+        background: linear-gradient(135deg, #1d6f42, #166534);
+        color: white;
+    }
+
+    .btn-excel:hover {
+        background: linear-gradient(135deg, #166534, #1d6f42);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(29, 111, 66, 0.25);
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .page-title {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 0;
+    }
+    
+    .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 2rem;
+    }
+    
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--border-color);
+    }
+    
+    .profile-info {
+        flex: 1;
+    }
+    
+    .profile-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-meta {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-dark);
+        padding: 0.5rem;
+        background: var(--light-bg);
+        border-radius: 8px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: var(--light-bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid var(--border-color);
+        transition: var(--transition);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+    
+    .section-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.3rem;
+        margin: 2.5rem 0 1.5rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .tab-container {
+        margin-bottom: 2rem;
+    }
+    
+    .tab-buttons {
+        display: flex;
+        border-bottom: 2px solid var(--border-color);
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .tab-button {
+        padding: 1rem 1.5rem;
+        background: none;
+        border: none;
+        font-weight: 600;
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: var(--transition);
+        border-bottom: 3px solid transparent;
+        background-color: #f8f9fc;
+        margin-right: 0.5rem;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .tab-button.active {
+        color: white;
+        background-color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 2rem;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .data-table th {
+        background-color: var(--light-bg);
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    
+    .data-table tr:hover {
+        background-color: #f8f9fc;
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-success {
+        background-color: #e6f4ee;
+        color: var(--success-color);
+    }
+    
+    .badge-warning {
+        background-color: #fef5e6;
+        color: var(--warning-color);
+    }
+    
+    .badge-info {
+        background-color: #e6f0f2;
+        color: var(--info-color);
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 0.3rem;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background-color: var(--success-color);
+        border-radius: 4px;
+    }
+    
+    .progress-info {
+        font-size: 0.85rem;
+        color: var(--text-dark);
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .ai-analysis {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .ai-analysis h3 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.3);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--text-light), #6c757d);
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(108, 117, 125, 0.25);
+    }
+    
+    /* Grafik stilleri */
+    .chart-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+    
+    .chart-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Ezber kartları için stiller */
+    .ezber-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .ezber-karti {
+        background: var(--light-bg);
+        padding: 1.2rem;
+        border-radius: 10px;
+        border: 2px solid var(--border-color);
+        transition: var(--transition);
+        position: relative;
+    }
+    
+    .ezber-karti.tamamlandi {
+        border-color: var(--success-color);
+        background-color: rgba(28, 200, 138, 0.1);
+    }
+    
+    .ezber-karti.devam {
+        border-color: var(--info-color);
+        background-color: rgba(54, 185, 204, 0.1);
+    }
+    
+    .ezber-karti:hover {
+        border-color: var(--secondary-color);
+        transform: translateY(-1px);
+    }
+    
+    .ezber-baslik {
+        color: var(--secondary-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .ezber-durum {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-weight: 500;
+    }
+    
+    .durum-tamamlandi {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .durum-devam {
+        background-color: var(--info-color);
+        color: white;
+    }
+    
+    .durum-baslamadi {
+        background-color: var(--text-light);
+        color: white;
+    }
+    
+    .tamamlandi-isareti {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: var(--success-color);
+        font-size: 1.5rem;
+    }
+    
+    /* Ders puanları için stiller */
+    .ders-puanlari {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .ders-puan-karti {
+        background: white;
+        padding: 1.2rem;
+        border-radius: 10px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        text-align: center;
+    }
+    
+    .ders-puan-adi {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .ders-puan-degeri {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .ders-puan-durumu {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        display: inline-block;
+    }
+    
+    .iyi-durum {
+        background-color: rgba(28, 200, 138, 0.2);
+        color: var(--success-color);
+    }
+    
+    .orta-durum {
+        background-color: rgba(246, 194, 62, 0.2);
+        color: var(--warning-color);
+    }
+    
+    .kotu-durum {
+        background-color: rgba(231, 74, 59, 0.2);
+        color: var(--danger-color);
+    }
+    
+    /* Karşılaştırmalı analiz için stiller */
+    .karsilastirma-kart {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    
+    .karsilastirma-baslik {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .karsilastirma-icerik {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .karsilastirma-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .karsilastirma-item:last-child {
+        border-bottom: none;
+    }
+    
+    /* Detaylı analiz tabloları */
+    .analiz-tablo {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1.5rem;
+    }
+    
+    .analiz-tablo th,
+    .analiz-tablo td {
+        padding: 0.8rem;
+        text-align: left;
+        border: 1px solid var(--border-color);
+    }
+    
+    .analiz-tablo th {
+        background-color: var(--light-bg);
+        font-weight: 600;
+    }
+    
+    .analiz-tablo tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    
+    .analiz-baslik {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+        text-align: center !important;
+    }
+    
+    .mevcut-ogrenci {
+        background-color: rgba(78, 115, 223, 0.1) !important;
+        font-weight: 600;
+    }
+    
+    /* Performans göstergeleri */
+    .performans-gostergeleri {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .performans-karti {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+    
+    .performans-baslik {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .performans-deger {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .performans-aciklama {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+        
+        .profile-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .profile-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .tab-buttons {
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+        
+        .chart-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .ezber-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .ders-puanlari {
+            grid-template-columns: 1fr;
+        }
+        
+        .karsilastirma-icerik {
+            grid-template-columns: 1fr;
+        }
+        
+        .analiz-tablo {
+            font-size: 0.8rem;
+        }
+        
+        .performans-gostergeleri {
+            grid-template-columns: 1fr;
+        }
+        /* AI Analiz Yükleniyor Stili */
+        .ai-analysis .spinner-border {
+            width: 2rem;
+            height: 2rem;
+            border-width: 2px;
+        }
+
+        /* Responsive düzenlemeler */
+        @media (max-width: 768px) {
+            .ai-analysis .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Sayfa Başlığı -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-user-graduate"></i> Öğrenci Detayı
+        </h1>
+        <a href="{% url 'ogrenci_listesi' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Öğrenci Listesine Dön
+        </a>
+    </div>
+    
+    <!-- Öğrenci Profil Bilgileri -->
+    <div class="profile-container">
+        <div class="profile-header">
+            {% if ogrenci.profil_foto %}
+            <img src="{{ ogrenci.profil_foto.url }}" alt="{{ ogrenci.ad_soyad }}" class="profile-image">
+            {% else %}
+            <div class="profile-image" style="background-color: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user" style="font-size: 3rem; color: #858796;"></i>
+            </div>
+            {% endif %}
+            
+            <div class="profile-info">
+                <h2 class="profile-name">{{ ogrenci.ad_soyad }}</h2>
+                
+                <div class="profile-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-layer-group"></i>
+                        <span>{{ ogrenci.get_seviye_display }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Kayıt: {{ ogrenci.kayit_tarihi|date:"d.m.Y" }} ({{ kayit_suresi_gun }} gün)</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Son Güncelleme: {{ ogrenci.son_guncelleme|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-trophy"></i>
+                        <span>Sınıf Sıralaması: {{ sinif_siralamasi }}/{{ toplam_ogrenci_sayisi }}</span>
+                    </div>
+                </div>
+                
+                {% if ogrenci.ozel_notlar %}
+                <div class="profile-notes">
+                    <p><strong>Özel Notlar:</strong> {{ ogrenci.ozel_notlar }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- İstatistik Kartları -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ sinav_ortalamasi|floatformat:1 }}</div>
+                <div class="stat-label">Sınav Ortalaması</div>
+                <div class="stat-desc">Sınıf: {{ sinif_ortalamasi|floatformat:1 }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">{{ tamamlanan_ezberler }}</div>
+                <div class="stat-label">Tamamlanan Ezber</div>
+                <div class="stat-desc">Toplam: 13</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">{{ devam_eden_ezberler }}</div>
+                <div class="stat-label">Devam Eden Ezber</div>
+                <div class="stat-desc">Başlamayan: {{ baslamayan_ezberler }}</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">{% if ortalama_ezber_suresi %}{{ ortalama_ezber_suresi|floatformat:1 }}{% else %}0{% endif %}</div>
+                <div class="stat-label">Ort. Ezber Süresi (gün)</div>
+                <div class="stat-desc">Tahmini: 7 gün</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Yapay Zeka Analizi -->
+    <!-- Yapay Zeka Analizi -->
+    <div id="ai-analysis-content">
+        {% if ai_analizi %}
+            <div>{{ ai_analizi|safe }}</div>
+            <div class="text-center mt-3">
+                <a href="#" class="btn btn-secondary btn-sm" onclick="hideAIAnalysis(); return false;">
+                    <i class="fas fa-times me-2"></i>AI Analizini Gizle
+                </a>
+            </div>
+        {% else %}
+            <div class="text-center py-4" id="ai-analysis-placeholder">
+                <p>AI analizini görmek için butona tıklayın.</p>
+                <a href="#" class="btn btn-primary mt-2" onclick="loadAIAnalysis(); return false;">
+                    <i class="fas fa-robot me-2"></i>AI Analizini Göster
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    <div id="ai-loading" class="text-center py-4" style="display: none;">
+        <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+        <p class="text-muted">Şeyma düşünüyor...</p>
+    </div>
+    
+    <!-- Tab İçeriği -->
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="sinavlar">Sınav Sonuçları</button>
+            <button class="tab-button" data-tab="ezberler">Ezber Durumu</button>
+            <button class="tab-button" data-tab="analiz">Detaylı Analiz</button>
+            <button class="tab-button" data-tab="karsilastirma">Karşılaştırmalar</button>
+            <button class="tab-button" data-tab="tum-veri">Tüm Veriler</button>
+        </div>
+        
+        <!-- Sınav Sonuçları Tab -->
+        <div class="tab-content active" id="sinavlar-tab">
+            <!-- Ders Bazlı Puanlar -->
+            <h3 class="section-title"><i class="fas fa-book"></i> Ders Bazlı Puanlar</h3>
+            <div class="ders-puanlari">
+                {% for ders, ortalama in ders_bazli_ortalama.items %}
+                <div class="ders-puan-karti">
+                    <div class="ders-puan-adi">{{ ders }}</div>
+                    <div class="ders-puan-degeri">{{ ortalama|floatformat:1 }}</div>
+                    <div class="ders-puan-durumu 
+                        {% if ortalama >= 85 %}iyi-durum
+                        {% elif ortalama >= 70 %}orta-durum
+                        {% else %}kotu-durum{% endif %}">
+                        {% if ortalama >= 85 %}Çok İyi
+                        {% elif ortalama >= 70 %}İyi
+                        {% elif ortalama >= 50 %}Orta
+                        {% else %}Zayıf{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Detaylı Sınav Sonuçları -->
+            <h3 class="section-title"><i class="fas fa-file-alt"></i> Detaylı Sınav Sonuçları</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ders</th>
+                            <th>Sınav Tipi</th>
+                            <th>Puan</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sinav in sinav_sonuclari %}
+                        <tr>
+                            <td>{{ sinav.ders.get_tur_display }}</td>
+                            <td>{{ sinav.get_sinav_tipi_display }}</td>
+                            <td>{{ sinav.puan }}</td>
+                            <td>{{ sinav.tarih|date:"d.m.Y" }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if sinav.puan >= 85 %}badge-success
+                                    {% elif sinav.puan >= 70 %}badge-info
+                                    {% else %}badge-warning{% endif %}">
+                                    {% if sinav.puan >= 85 %}Çok İyi
+                                    {% elif sinav.puan >= 70 %}İyi
+                                    {% elif sinav.puan >= 50 %}Orta
+                                    {% else %}Zayıf{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Henüz sınav sonucu bulunmamaktadır.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Ezber Durumu Tab -->
+        <div class="tab-content" id="ezberler-tab">
+            <div class="ezber-grid">
+                {% for ezber in ezber_kayitlari %}
+                <div class="ezber-karti {% if ezber.durum == 'TAMAMLANDI' %}tamamlandi{% elif ezber.durum == 'DEVAM' %}devam{% endif %}">
+                    {% if ezber.durum == 'TAMAMLANDI' %}
+                    <i class="fas fa-check-circle tamamlandi-isareti"></i>
+                    {% endif %}
+                    
+                    <div class="ezber-baslik">
+                        <span>{{ ezber.sure.ad }}</span>
+                        <span class="ezber-durum durum-{{ ezber.durum|lower }}">
+                            {% if ezber.durum == 'TAMAMLANDI' %}Tamamlandı
+                            {% elif ezber.durum == 'DEVAM' %}Devam Ediyor
+                            {% else %}Başlamadı{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="ezber-progress">
+                        <label class="form-label">
+                            <i class="fas fa-chart-line"></i> İlerleme Durumu (%)
+                        </label>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {% if ezber.durum == 'TAMAMLANDI' %}100%{% elif ezber.durum == 'DEVAM' %}50%{% else %}0%{% endif %}"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span>0%</span>
+                            <span>{% if ezber.durum == 'TAMAMLANDI' %}100%{% elif ezber.durum == 'DEVAM' %}50%{% else %}0%{% endif %}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ezber-dates">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-plus"></i> Başlama Tarihi
+                            </label>
+                            <p>{% if ezber.baslama_tarihi %}{{ ezber.baslama_tarihi|date:"d.m.Y" }}{% else %}-{% endif %}</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-check"></i> Bitiş Tarihi
+                            </label>
+                            <p>{% if ezber.bitis_tarihi %}{{ ezber.bitis_tarihi|date:"d.m.Y" }}{% else %}-{% endif %}</p>
+                        </div>
+                    </div>
+                    
+                    {% if ezber.yorum %}
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-comment"></i> Yorum
+                        </label>
+                        <p>{{ ezber.yorum }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div style="text-align: center; grid-column: 1 / -1; padding: 2rem;">
+                    Henüz ezber kaydı bulunmamaktadır.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Analiz Tab -->
+        <div class="tab-content" id="analiz-tab">
+            <div class="chart-container">
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Tüm Sınav Sonuçları</h3>
+                    <canvas id="tumSinavSonuclariChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Ezber Durumu Dağılımı</h3>
+                    <canvas id="ezberDurumChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="karsilastirma-kart">
+                <h3 class="karsilastirma-baslik"><i class="fas fa-chart-line"></i> Sınıf Ortalaması Karşılaştırması</h3>
+                <table class="analiz-tablo">
+                    <tr>
+                        <th class="analiz-baslik" colspan="5">Sınıf İçi Karşılaştırma</th>
+                    </tr>
+                    <tr>
+                        <th>Ders</th>
+                        <th>Öğrenci Puanı</th>
+                        <th>Sınıf Ortalaması</th>
+                        <th>Fark</th>
+                        <th>Durum</th>
+                    </tr>
+                    {% for ders, ortalama in ders_bazli_ortalama.items %}
+                    <tr>
+                        <td>{{ ders }}</td>
+                        <td>{{ ortalama|floatformat:1 }}</td>
+                        <td>
+                            {% if ders == "Akaid" %}78.2
+                            {% elif ders == "Fıkıh" %}72.5
+                            {% elif ders == "Siyer" %}81.3
+                            {% elif ders == "Tecvid" %}75.8
+                            {% else %}75.0{% endif %}
+                        </td>
+                        <td>
+                            {% if ders == "Akaid" %}{{ ortalama|floatformat:1|add:"-78.2"|floatformat:1 }}
+                            {% elif ders == "Fıkıh" %}{{ ortalama|floatformat:1|add:"-72.5"|floatformat:1 }}
+                            {% elif ders == "Siyer" %}{{ ortalama|floatformat:1|add:"-81.3"|floatformat:1 }}
+                            {% elif ders == "Tecvid" %}{{ ortalama|floatformat:1|add:"-75.8"|floatformat:1 }}
+                            {% else %}{{ ortalama|floatformat:1|add:"-75.0"|floatformat:1 }}{% endif %}
+                        </td>
+                        <td>
+                            {% if ders == "Akaid" %}
+                                {% if ortalama > 78.2 %}<span style="color: green;">↑ Yukarıda</span>
+                                {% elif ortalama < 78.2 %}<span style="color: red;">↓ Aşağıda</span>
+                                {% else %}<span style="color: blue;">→ Eşit</span>{% endif %}
+                            {% elif ders == "Fıkıh" %}
+                                {% if ortalama > 72.5 %}<span style="color: green;">↑ Yukarıda</span>
+                                {% elif ortalama < 72.5 %}<span style="color: red;">↓ Aşağıda</span>
+                                {% else %}<span style="color: blue;">→ Eşit</span>{% endif %}
+                            {% elif ders == "Siyer" %}
+                                {% if ortalama > 81.3 %}<span style="color: green;">↑ Yukarıda</span>
+                                {% elif ortalama < 81.3 %}<span style="color: red;">↓ Aşağıda</span>
+                                {% else %}<span style="color: blue;">→ Eşit</span>{% endif %}
+                            {% elif ders == "Tecvid" %}
+                                {% if ortalama > 75.8 %}<span style="color: green;">↑ Yukarıda</span>
+                                {% elif ortalama < 75.8 %}<span style="color: red;">↓ Aşağıda</span>
+                                {% else %}<span style="color: blue;">→ Eşit</span>{% endif %}
+                            {% else %}
+                                {% if ortalama > 75.0 %}<span style="color: green;">↑ Yukarıda</span>
+                                {% elif ortalama < 75.0 %}<span style="color: red;">↓ Aşağıda</span>
+                                {% else %}<span style="color: blue;">→ Eşit</span>{% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            
+            <div class="karsilastirma-kart">
+                <h3 class="karsilastirma-baslik"><i class="fas fa-trophy"></i> Performans Analizi</h3>
+                <div class="karsilastirma-icerik">
+                    <div>
+                        <div class="karsilastirma-item">
+                            <span>Toplam Tamamlanan Ezber:</span>
+                            <span>{{ tamamlanan_ezberler }} / 13</span>
+                        </div>
+                        <div class="karsilastirma-item">
+                            <span>Tamamlama Oranı:</span>
+                            <span>{% widthratio tamamlanan_ezberler 13 100 %}%</span>
+                        </div>
+                        <div class="karsilastirma-item">
+                            <span>Ortalama Ezber Süresi:</span>
+                            <span>
+                                {% if tamamlanan_ezberler > 0 %}
+                                    {{ ortalama_ezber_suresi|floatformat:1 }} gün
+                                {% else %}
+                                    Veri yok
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="karsilastirma-item">
+                            <span>Hafızlık Potansiyeli:</span>
+                            <span>
+                                {% if kayit_suresi_gun > 90 %}
+                                    {% if tamamlanan_ezberler >= 10 %}Yüksek
+                                    {% elif tamamlanan_ezberler >= 7 %}Orta
+                                    {% elif tamamlanan_ezberler >= 4 %}Düşük
+                                    {% else %}Belirsiz{% endif %}
+                                {% else %}
+                                    Değerlendirme için yeterli süre yok
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="karsilastirma-item">
+                            <span>Önerilen Çalışma Süresi:</span>
+                            <span>
+                                {% if sinav_ortalamasi < 50 %}8 saat/gün
+                                {% elif sinav_ortalamasi < 60 %}6 saat/gün
+                                {% elif sinav_ortalamasi < 70 %}4 saat/gün
+                                {% elif sinav_ortalamasi < 80 %}2 saat/gün
+                                {% else %}1 saat/gün{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Karşılaştırmalar Tab -->
+        <div class="tab-content" id="karsilastirma-tab">
+            <div class="chart-container">
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Sınav Performansı - Sınıf Karşılaştırması</h3>
+                    <canvas id="sinavKarsilastirmaChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Ezber Performansı - Sınıf Karşılaştırması</h3>
+                    <canvas id="ezberKarsilastirmaChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tüm Veriler Tab -->
+        <div class="tab-content" id="tum-veri-tab">
+            <h3 class="section-title"><i class="fas fa-database"></i> Tüm Öğrenci Verileri</h3>
+            
+            <h4>Sınav Sonuçları</h4>
+            <table class="analiz-tablo">
+                <tr>
+                    <th class="analiz-baslik" colspan="6">Sınav Sonuçları - {{ ogrenci.ad_soyad }}</th>
+                </tr>
+                <tr>
+                    <th>Ders</th>
+                    <th>Sınav Tipi</th>
+                    <th>Puan</th>
+                    <th>Tarih</th>
+                    <th>Açıklama</th>
+                    <th>Durum</th>
+                </tr>
+                {% for sinav in sinav_sonuclari %}
+                <tr>
+                    <td>{{ sinav.ders.get_tur_display }}</td>
+                    <td>{{ sinav.get_sinav_tipi_display }}</td>
+                    <td>{{ sinav.puan }}</td>
+                    <td>{{ sinav.tarih|date:"d.m.Y" }}</td>
+                    <td>{{ sinav.aciklama|default:"-" }}</td>
+                    <td>
+                        {% if sinav.puan >= 85 %}Çok İyi
+                        {% elif sinav.puan >= 70 %}İyi
+                        {% elif sinav.puan >= 50 %}Orta
+                        {% else %}Zayıf{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">Henüz sınav sonucu bulunmamaktadır.</td>
+                </tr>
+                {% endfor %}
+            </table>
+            
+            <h4>Ezber Kayıtları</h4>
+            <table class="analiz-tablo">
+                <tr>
+                    <th class="analiz-baslik" colspan="7">Ezber Kayıtları - {{ ogrenci.ad_soyad }}</th>
+                </tr>
+                <tr>
+                    <th>Sıra</th>
+                    <th>Sure</th>
+                    <th>Durum</th>
+                    <th>Başlama Tarihi</th>
+                    <th>Bitiş Tarihi</th>
+                    <th>İlerleme</th>
+                    <th>Yorum</th>
+                </tr>
+                {% for ezber in ezber_kayitlari %}
+                <tr>
+                    <td>{{ ezber.sure.sira }}</td>
+                    <td>{{ ezber.sure.ad }}</td>
+                    <td>
+                        {% if ezber.durum == 'TAMAMLANDI' %}Tamamlandı
+                        {% elif ezber.durum == 'DEVAM' %}Devam Ediyor
+                        {% else %}Başlamadı{% endif %}
+                    </td>
+                    <td>{{ ezber.baslama_tarihi|date:"d.m.Y"|default:"-" }}</td>
+                    <td>{{ ezber.bitis_tarihi|date:"d.m.Y"|default:"-" }}</td>
+                    <td>{{ ezber.ilerleme }}%</td>
+                    <td>{{ ezber.yorum|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center;">Henüz ezber kaydı bulunmamaktadır.</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    
+    <!-- İşlem Butonları -->
+    <div class="action-buttons">
+        <a href="{% url 'ogrenci_duzenle' ogrenci.id %}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Öğrenciyi Düzenle
+        </a>
+        <a href="{% url 'export_ogrenci_detay_excel' ogrenci.id %}" class="btn btn-success">
+            <i class="fas fa-file-excel"></i> Excel'e Aktar
+        </a>
+        <a href="{% url 'ogrenci_sil' ogrenci.id %}" class="btn btn-secondary" onclick="return confirm('Bu öğrenciyi silmek istediğinize emin misiniz?');">
+            <i class="fas fa-trash"></i> Öğrenciyi Sil
+        </a>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript -->
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab işlevselliği
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Tüm tabları ve içerikleri devre dışı bırak
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Tıklanan tabı etkinleştir
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+                
+                // Analiz tabı aktifse grafikleri çiz
+                if (tabId === 'analiz' || tabId === 'karsilastirma') {
+                    initCharts();
+                }
+            });
+        });
+        
+        // Grafikleri başlatma fonksiyonu
+        function initCharts() {
+            // Tüm sınav sonuçları grafiği
+            const tumSinavSonuclariCtx = document.getElementById('tumSinavSonuclariChart')?.getContext('2d');
+            
+            if (tumSinavSonuclariCtx) {
+                // Sınav verilerini hazırla
+                const sinavLabels = [];
+                const sinavData = [];
+                
+                {% for sinav in sinav_sonuclari %}
+                    sinavLabels.push('{{ sinav.ders.get_tur_display }} - {{ sinav.get_sinav_tipi_display }}');
+                    sinavData.push({{ sinav.puan }});
+                {% endfor %}
+                
+                new Chart(tumSinavSonuclariCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: sinavLabels,
+                        datasets: [{
+                            label: 'Sınav Puanları',
+                            data: sinavData,
+                            backgroundColor: 'rgba(78, 115, 223, 0.7)',
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Puan'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Ezber durumu grafiği
+            const ezberDurumCtx = document.getElementById('ezberDurumChart')?.getContext('2d');
+            
+            // Ezber durumu grafiği - DÜZELTİLMİŞ KISIM
+            if (ezberDurumCtx) {
+                new Chart(ezberDurumCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Tamamlanan', 'Devam Eden', 'Başlamayan'],
+                        datasets: [{
+                            data: [{{ tamamlanan_ezberler }}, {{ devam_eden_ezberler }}, {{ baslamayan_ezberler }}],  <!-- DÜZELTİLDİ: baslamayan_ezberlers -> baslamayan_ezberler -->
+                            backgroundColor: [
+                                'rgba(28, 200, 138, 0.7)',
+                                'rgba(54, 185, 204, 0.7)',
+                                'rgba(108, 117, 125, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(28, 200, 138, 1)',
+                                'rgba(54, 185, 204, 1)',
+                                'rgba(108, 117, 125, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            }
+            // Sınav karşılaştırma grafiği
+            const sinavKarsilastirmaCtx = document.getElementById('sinavKarsilastirmaChart')?.getContext('2d');
+            const ezberKarsilastirmaCtx = document.getElementById('ezberKarsilastirmaChart')?.getContext('2d');
+            
+            if (sinavKarsilastirmaCtx && ezberKarsilastirmaCtx) {
+                // Öğrenci verilerini al
+                const ogrenciVerileri = JSON.parse('{{ tum_ogrenci_verileri|escapejs }}');
+                
+                // Sınav karşılaştırma grafiği
+                new Chart(sinavKarsilastirmaCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ogrenciVerileri.map(o => o.ad_soyad),
+                        datasets: [{
+                            label: 'Sınav Ortalaması',
+                            data: ogrenciVerileri.map(o => o.ortalama),
+                            backgroundColor: ogrenciVerileri.map(o => o.mevcut_ogrenci ? 'rgba(78, 115, 223, 1)' : 'rgba(78, 115, 223, 0.5)'),
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Ortalama Puan'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Ezber karşılaştırma grafiği - DÜZELTİLMİŞ KISIM
+                new Chart(ezberKarsilastirmaCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ogrenciVerileri.map(o => o.ad_soyad),
+                        datasets: [{
+                            label: 'Tamamlanan Ezber',
+                            data: ogrenciVerileri.map(o => o.tamamlanan_ezber),
+                            backgroundColor: ogrenciVerileri.map(o => o.mevcut_ogrenci ? 'rgba(28, 200, 138, 1)' : 'rgba(28, 200, 138, 0.5)'),
+                            borderColor: 'rgba(28, 200, 138, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 13, // Maksimum değeri 13 olarak sabitledik
+                                title: {
+                                    display: true,
+                                    text: 'Tamamlanan Ezber Sayısı'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Sayfa yüklendiğinde grafikleri başlat
+        initCharts();
+    });
+</script>
+{% endblock %}

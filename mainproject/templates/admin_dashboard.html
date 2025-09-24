@@ -1,0 +1,579 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Kontrol Paneli | Şeyma{% endblock %}
+
+{% block css_file %}
+<style>
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+  }
+  
+  .stat-label {
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: all 0.3s;
+    text-align: center;
+    border: 2px solid transparent;
+  }
+  
+  .quick-action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .quick-action-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+  }
+  
+  .chart-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    /* Grafikler için sabit yükseklik */
+    height: 350px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .chart-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  /* Grafikler için özel konteyner */
+  .chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 280px;
+  }
+  
+  .data-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .data-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  }
+  
+  .data-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .data-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .data-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .data-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .data-item:last-child {
+    border-bottom: none;
+  }
+  
+  .data-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f8f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: var(--primary-color);
+  }
+  
+  .data-content {
+    flex: 1;
+  }
+  
+  .data-main {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  
+  .data-sub {
+    font-size: 0.85rem;
+    color: #464040fff;
+  }
+  
+  .view-all {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .view-all a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  /* Responsive düzenlemeler */
+  @media (max-width: 768px) {
+    .dashboard-stats {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .chart-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .chart-card {
+      height: 320px;
+      padding: 1rem;
+    }
+    
+    .chart-wrapper {
+      height: 250px;
+    }
+    
+    .data-section {
+      grid-template-columns: 1fr;
+    }
+    
+    .quick-actions {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .chart-card {
+      height: 300px;
+      padding: 0.75rem;
+    }
+    
+    .chart-wrapper {
+      height: 230px;
+    }
+    
+    .quick-actions {
+      grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+      padding: 1rem;
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="page-header">
+    <h1 class="page-title">
+      <i class="fas fa-tachometer-alt"></i> Kontrol Paneli
+    </h1>
+  </div>
+  
+  <!-- İstatistik Kartları -->
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-file-alt"></i>
+      </div>
+      <div class="stat-number">{{ toplam_yazi }}</div>
+      <div class="stat-label">Toplam Yazı</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <div class="stat-number">{{ toplam_ogrenci }}</div>
+      <div class="stat-label">Toplam Öğrenci</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-number">{{ sinif_ortalamasi|floatformat:1 }}%</div>
+      <div class="stat-label">Sınıf Ortalaması</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <div class="stat-number">{{ tamamlanan_ezber }}</div>
+      <div class="stat-label">Tamamlanan Ezber</div>
+    </div>
+  </div>
+  
+  <!-- Hızlı Erişim Butonları -->
+  <div class="quick-actions">
+    <a href="{% url 'admin-paneli' %}" class="quick-action-btn">
+      <div class="quick-action-icon">
+        <i class="fas fa-edit"></i>
+      </div>
+      <div>Yazı Yaz</div>
+    </a>
+    
+    <a href="{% url 'yeni_ogrenci' %}" class="quick-action-btn">
+      <div class="quick-action-icon">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div>Öğrenci Ekle</div>
+    </a>
+    
+    <a href="{% url 'arama_motoru' %}" class="quick-action-btn">
+      <div class="quick-action-icon">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div>Yapay Zeka</div>
+    </a>
+    
+    <a href="{% url 'admin-yazi-listesi' %}" class="quick-action-btn">
+      <div class="quick-action-icon">
+        <i class="fas fa-list"></i>
+      </div>
+      <div>Tüm Yazılar</div>
+    </a>
+  </div>
+  
+  <!-- Grafikler -->
+  <div class="chart-container">
+    <div class="chart-card">
+      <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Seviye Dağılımı</h3>
+      <div class="chart-wrapper">
+        <canvas id="seviyeDagilimChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-card">
+      <h3 class="chart-title"><i class="fas fa-chart-bar"></i> En Başarılı 5 Öğrenci</h3>
+      <div class="chart-wrapper">
+        <canvas id="enBasariliOgrencilerChart"></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Veri Bölümleri -->
+  <div class="data-section">
+    <!-- Son Eklenen Öğrenciler -->
+    <div class="data-card">
+      <div class="data-header">
+        <h3 class="data-title"><i class="fas fa-user-plus"></i> Son Eklenen Öğrenciler</h3>
+      </div>
+      <ul class="data-list">
+        {% for ogrenci in son_ogrenciler %}
+        <li class="data-item">
+          <div class="data-icon">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <div class="data-content">
+            <div class="data-main">{{ ogrenci.ad_soyad }}</div>
+            <div class="data-sub">{{ ogrenci.kayit_tarihi|date:"d.m.Y" }} | {{ ogrenci.get_seviye_display }}</div>
+          </div>
+        </li>
+        {% empty %}
+        <li class="data-item">
+          <div class="data-content">
+            <div class="data-main">Henüz öğrenci kaydı bulunmamaktadır</div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <div class="view-all">
+        <a href="{% url 'ogrenci_listesi' %}">
+          Tüm Öğrencileri Görüntüle <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Son Yazılar -->
+    <div class="data-card">
+      <div class="data-header">
+        <h3 class="data-title"><i class="fas fa-file-alt"></i> Son Yazılar</h3>
+      </div>
+      <ul class="data-list">
+        {% for yazi in son_yazilar %}
+        <li class="data-item">
+          <div class="data-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="data-content">
+            <div class="data-main">{{ yazi.title }}</div>
+            <div class="data-sub">{{ yazi.isActive|yesno:"Yayında,Taslak" }} | {{ yazi.olusturulma_tarihi|date:"d.m.Y" }}</div>
+          </div>
+        </li>
+        {% empty %}
+        <li class="data-item">
+          <div class="data-content">
+            <div class="data-main">Henüz yazı bulunmamaktadır</div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <div class="view-all">
+        <a href="{% url 'admin-yazi-listesi' %}">
+          Tüm Yazıları Görüntüle <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Ezber Durumu -->
+    <div class="data-card">
+      <div class="data-header">
+        <h3 class="data-title"><i class="fas fa-tasks"></i> Ezber Durumu</h3>
+      </div>
+      <ul class="data-list">
+        <li class="data-item">
+          <div class="data-icon" style="color: var(--success-color);">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="data-content">
+            <div class="data-main">Tamamlanan Ezberler</div>
+            <div class="data-sub">{{ tamamlanan_ezber }} sayfa</div>
+          </div>
+        </li>
+        <li class="data-item">
+          <div class="data-icon" style="color: var(--warning-color);">
+            <i class="fas fa-spinner"></i>
+          </div>
+          <div class="data-content">
+            <div class="data-main">Devam Eden Ezberler</div>
+            <div class="data-sub">{{ devam_eden_ezber }} sayfa</div>
+          </div>
+        </li>
+        <li class="data-item">
+          <div class="data-icon" style="color: var(--info-color);">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <div class="data-content">
+            <div class="data-main">Tamamlama Oranı</div>
+            <div class="data-sub">{{ ezber_tamamlama_orani }}%</div>
+          </div>
+        </li>
+      </ul>
+      <div class="view-all">
+        <a href="{% url 'ogrenci_listesi' %}">
+          Detaylı Rapor <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Seviye Dağılımı Grafiği
+    const seviyeChart = document.getElementById('seviyeDagilimChart');
+    if (seviyeChart) {
+        const seviyeData = {
+            labels: ['Hazırlık 1', 'Hazırlık 2', 'Hazırlık 3', 'Temel', 'İleri', 'Hafızlık'],
+            datasets: [{
+                data: [
+                    {{ seviye_dagilimi.HAZ1 }},
+                    {{ seviye_dagilimi.HAZ2 }},
+                    {{ seviye_dagilimi.HAZ3 }},
+                    {{ seviye_dagilimi.TEMEL }},
+                    {{ seviye_dagilimi.ILERI }},
+                    {{ seviye_dagilimi.HAFIZLIK }}
+                ],
+                backgroundColor: [
+                    '#28a745', // HAZ1 - yeşil
+                    '#17a2b8', // HAZ2 - mavi
+                    '#ffc107', // HAZ3 - sarı
+                    '#007bff', // TEMEL - mavi
+                    '#6f42c1', // ILERI - mor
+                    '#fd7e14'  // HAFIZLIK - turuncu
+                ],
+                                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        };
+
+        new Chart(seviyeChart, {
+            type: 'doughnut',
+            data: seviyeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // En Başarılı 5 Öğrenci Grafiği
+    const basariliChart = document.getElementById('enBasariliOgrencilerChart');
+    if (basariliChart) {
+        const ogrenciIsimleri = [
+            {% for ogrenci in en_basarili_5_ogrenci %}
+            '{{ ogrenci.ad_soyad }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        const ogrenciOrtalamalari = [
+            {% for ogrenci in en_basarili_5_ogrenci %}
+            "{{ ogrenci.ders_ortalamasi|default:0|floatformat:1 }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ].map(val => parseFloat(val.replace(',', '.')));
+
+        const kisaltilmisIsimler = ogrenciIsimleri.map(isim => isim.length > 15 ? isim.substring(0, 12) + '...' : isim);
+
+        const basariliData = {
+            labels: kisaltilmisIsimler,
+            datasets: [{
+                label: 'Ortalama Puan',
+                data: ogrenciOrtalamalari,
+                backgroundColor: 'rgba(28, 200, 138, 0.8)',
+                borderColor: 'rgba(28, 200, 138, 1)',
+                borderWidth: 2,
+                borderRadius: 4,
+                barPercentage: 0.6
+            }]
+        };
+
+        new Chart(basariliChart, {
+            type: 'bar',
+            data: basariliData,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: { right: 20 } },
+                scales: {
+                    x: { beginAtZero: true, max: 100, grid: { display: true, drawBorder: false }, title: { display: true, text: 'Ortalama Puan', font: { weight: 'bold' } } },
+                    y: { grid: { display: false }, ticks: { font: { size: 12 } } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) { return ogrenciIsimleri[tooltipItems[0].dataIndex]; },
+                            label: function(context) { return `Ortalama: ${context.parsed.x.toFixed(1)}`; }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

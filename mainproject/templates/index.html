@@ -1,0 +1,848 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block page_title %}Şeyma - Ana Sayfa{% endblock %}
+
+{% block css_file %}
+<style>
+    /* Özel stiller */
+    .hero-section {
+        background: linear-gradient(135deg, rgba(78, 115, 223, 0.05) 0%, rgba(58, 86, 196, 0.1) 100%);
+        border-radius: 25px;
+        padding: 4rem 2rem;
+        margin: 2rem 0;
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        color: var(--text-light);
+        max-width: 800px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .quote-card {
+        background: linear-gradient(135deg, #4e73df 0%, #3a56c4 100%);
+        border: none;
+        border-radius: 20px;
+        color: white;
+        margin: 3rem auto;
+        max-width: 800px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .quote-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+    }
+    
+    .quote-card .card-body {
+        position: relative;
+        z-index: 1;
+        padding: 2.5rem;
+    }
+    
+    .quote-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+    
+    .quote-text {
+        font-style: italic;
+        font-size: 1.3rem;
+        line-height: 1.6;
+        margin-bottom: 0;
+        font-weight: 300;
+    }
+    
+    /* Blog Kartları */
+    .blog-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .blog-image {
+        height: 220px;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+    
+    .blog-card:hover .blog-image {
+        transform: scale(1.05);
+    }
+    
+    .blog-content {
+        padding: 1.8rem;
+    }
+    
+    .blog-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        line-height: 1.4;
+    }
+    
+    .blog-text {
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+    
+    .blog-btn {
+        padding: 0.7rem 1.8rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    
+    /* Hakkımda Section */
+    .about-section {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 25px;
+        padding: 4rem 2rem;
+        margin: 4rem 0;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .profile-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        transition: var(--transition);
+    }
+    
+    .profile-image:hover {
+        transform: scale(1.05);
+    }
+    
+    .social-links {
+        margin-top: 2rem;
+    }
+    
+    .social-link {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        margin: 0 0.7rem;
+        transition: var(--transition);
+        box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+    }
+    
+    .social-link:hover {
+        transform: translateY(-3px) rotate(5deg);
+        box-shadow: 0 8px 25px rgba(78, 115, 223, 0.4);
+    }
+    
+    .about-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .about-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+    }
+    
+    .about-btn {
+        padding: 1rem 2.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    
+    /* Alıntı Kutusu */
+    .quote-box {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 25px;
+        text-align: center;
+        font-style: italic;
+        font-size: 1.4rem;
+        line-height: 1.6;
+        margin: 4rem 0;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .quote-box::before {
+        content: '"';
+        position: absolute;
+        top: -20px;
+        left: 20px;
+        font-size: 8rem;
+        opacity: 0.1;
+        font-family: 'Playfair Display', serif;
+    }
+    
+    .quote-author {
+        font-weight: 600;
+        font-style: normal;
+        margin-top: 1.5rem;
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* İstatistikler */
+    .stats-section {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: 25px;
+        margin: 4rem 0;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.8);
+        font-weight: 400;
+    }
+    
+    /* Öne Çıkan Sorular Bölümü */
+    .faq-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 25px;
+        padding: 4rem 2rem;
+        margin: 4rem 0;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .faq-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .faq-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+    
+    .faq-subtitle {
+        color: var(--text-light);
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .accordion-item {
+        border: none;
+        border-radius: 15px !important;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .accordion-button {
+        background: white;
+        border: none;
+        border-radius: 15px !important;
+        padding: 1.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--text-color);
+        box-shadow: none !important;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+    }
+    
+    .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%234e73df'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    
+    .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    
+    .accordion-body {
+        padding: 1.5rem;
+        background: white;
+        line-height: 1.7;
+        color: var(--text-light);
+    }
+    
+    .faq-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 1rem;
+    }
+    
+    .faq-link:hover {
+        text-decoration: underline;
+    }
+    
+    /* Hafızlık Rehberi Bölümü */
+    .guide-section {
+        margin: 4rem 0;
+    }
+    
+    .guide-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+    }
+    
+    .guide-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .guide-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 20px rgba(78, 115, 223, 0.25);
+    }
+    
+    .guide-content {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .guide-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+    }
+    
+    .guide-text {
+        color: var(--text-light);
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+    
+    .guide-btn {
+        padding: 0.7rem 1.8rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    
+    /* E-Bülten Bölümü */
+    .newsletter-section {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: 25px;
+        margin: 4rem 0;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+    }
+    
+    .newsletter-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .newsletter-text {
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .newsletter-form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .quote-card .card-body {
+            padding: 2rem;
+        }
+        
+        .quote-text {
+            font-size: 1.1rem;
+        }
+        
+        .about-section {
+            padding: 3rem 1.5rem;
+        }
+        
+        .about-title {
+            font-size: 2rem;
+        }
+        
+        .quote-box {
+            padding: 2rem;
+            font-size: 1.2rem;
+        }
+        
+        .stat-number {
+            font-size: 2.8rem;
+        }
+        
+        .faq-section {
+            padding: 3rem 1.5rem;
+        }
+        
+        .faq-title {
+            font-size: 2rem;
+        }
+        
+        .accordion-button {
+            padding: 1.2rem;
+            font-size: 1rem;
+        }
+        
+        .guide-content {
+            padding: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .quote-card {
+            margin: 2rem auto;
+        }
+        
+        .quote-card .card-body {
+            padding: 1.5rem;
+        }
+        
+        .quote-icon {
+            font-size: 2.5rem;
+        }
+        
+        .about-section {
+            padding: 2rem 1rem;
+        }
+        
+        .profile-image {
+            width: 170px;
+            height: 170px;
+        }
+        
+        .quote-box {
+            padding: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .faq-section {
+            padding: 2rem 1rem;
+        }
+        
+        .faq-title {
+            font-size: 1.8rem;
+        }
+        
+        .guide-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section fade-in-up">
+    <div class="container">
+        <h1 class="hero-title">Kur'an Öğretmeni & Hafız</h1>
+        <p class="hero-subtitle">Tecvidli Kur'an okuma, hafızlık eğitimi ve temel dini bilgiler üzerine yazılar, tavsiyeler ve rehberlik</p>
+        <div class="hero-buttons">
+            <a href="{% url "blog" %}" class="btn btn-primary btn-lg rounded-pill px-4">
+                <i class="fas fa-book-open me-2"></i> Yazıları Oku
+            </a>
+            <a href="#hafizlik" class="btn btn-outline-primary btn-lg rounded-pill px-4">
+                <i class="fas fa-graduation-cap me-2"></i> Hafızlık Rehberi
+            </a>
+            <a href="#sss" class="btn btn-outline-secondary btn-lg rounded-pill px-4">
+                <i class="fas fa-envelope me-2"></i> Sık Sorulan Sorular
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Rastgele Söz Kartı -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card quote-card fade-in-up">
+                <div class="card-body text-center">
+                    <div class="quote-icon">📜</div>
+                    <h5 class="card-title mb-3">Günün Sözü</h5>
+                    <p class="quote-text">"{{ rastgele_soz }}"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- İçerik -->
+<div class="container mt-5">
+
+    <!-- Blog Yazıları -->
+    <!-- Blog Yazıları -->
+    <section class="mb-5" id="yazilar">
+        <h2 class="section-title text-center mb-4 fade-in-up">📘 En Son Blog Yazıları</h2>
+        <div class="row g-4">
+            {% for yazi in son_yazilar %}
+            <div class="col-lg-4 col-md-6 col-12 fade-in-up">
+                <div class="card blog-card h-100">
+                    {% if yazi.imageUrl %}
+                    <img src="{{ yazi.imageUrl.url }}" class="card-img-top blog-image" alt="{{ yazi.title }}">
+                    {% endif %}
+                    <div class="blog-content">
+                        <h5 class="blog-title">{{ yazi.title|safe }}</h5>
+                        <p class="blog-text">
+                            {% comment %} Özel karakterleri koruyarak temizleme {% endcomment %}
+                            {% autoescape off %}
+                                {{ yazi.description|striptags|truncatechars:120 }}
+                            {% endautoescape %}
+                        </p>
+                        <div class="mt-auto">
+                            <a href="{% url 'detay' yazi.slug %}" class="btn btn-outline-primary blog-btn">
+                                Devamını Oku
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Öne Çıkan Sorular -->
+    <section class="faq-section fade-in-up">
+        <div class="container">
+            <div class="faq-header">
+                <h2 id="sss" class="faq-title">❓ Sık Sorulan Sorular</h2>
+                <p class="faq-subtitle">Hafızlık, Kur'an eğitimi ve dini bilgiler hakkında en çok merak edilen sorular ve cevapları</p>
+            </div>
+            
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Hafızlık eğitimine kaç yaşında başlanmalı?
+                        </button>
+                    </h3>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Hafızlık eğitimi için ideal yaş aralığı 10-18 yaş arasıdır. Bu dönemde zihin öğrenmeye daha açık ve ezber kapasitesi yüksektir. Ancak istek, azim ve düzenli çalışma olduğunda her yaşta hafızlık yapılabilir.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Günde ne kadar zaman ayırarak hafızlık yapılabilir?
+                        </button>
+                    </h3>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Hafızlık için günde en az 3-4 saat düzenli ve disiplinli çalışma gerekmektedir. Bu süreyi sabah namazı sonrası ve akşam üzeri olmak üzere iki seansta değerlendirmek verimliliği artırır. Önemli olan çalışmanın süresi değil, düzenli ve sürekli olmasıdır.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Tecvid kurallarını öğrenmek ne kadar sürer?
+                        </button>
+                    </h3>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Temel tecvid kurallarını öğrenmek ortalama 2-3 ay sürmektedir. Ancak bu kuralları içselleştirip doğru uygulamak için en az 6 aylık bir pratik gereklidir. Tecvid, teorik bilgiden çok pratik gerektiren bir ilimdir.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            Hafızlık yaparken unutma problemi yaşanır mı?
+                        </button>
+                    </h3>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Hafızlık sürecinde zaman zaman unutma problemleri yaşanabilir. Bu tamamen normaldir. Önemli olan düzenli tekrar yapmaktır. Her gün belirli bir süreyi tekrara ayırarak bu sorunun önüne geçebilirsiniz.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            Çocuğum için evde Kur'an eğitimine nasıl başlayabilirim?
+                        </button>
+                    </h3>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Çocuklar için Kur'an eğitimine öncelikle harfleri ve harekeleri öğreterek başlayabilirsiniz. Kısa surelerle ve oyunlaştırarak öğretmek çocuğun ilgisini çekecektir. Sabırlı olmak ve küçük adımlarla ilerlemek önemlidir.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h3 class="accordion-header" id="headingSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            Yetişkinler için hafızlık yapmak daha mı zordur?
+                        </button>
+                    </h3>
+                    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yetişkinlerin hafızlık yapması çocuklara göre farklı zorluklar içerebilir. Ancak yetişkinlerin anlama ve disiplinli çalışma konusunda avantajları vardır. Düzenli çalışma ve sabırla her yaşta hafızlık yapılabilir.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hakkımda -->
+    <section class="about-section fade-in-up">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-4 col-md-5 text-center mb-4 mb-md-0">
+                    <img src="{% static 'blog/img/profil.jpg' %}" class="rounded-circle profile-image" alt="Şeyma">
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-7">
+                    <h2 class="about-title">Hakkımda</h2>
+                    <p class="about-text">
+                        Kur'an öğretmeni ve hafızım. Amacım, öğrencilerime Allah'ın kelamını sevdirerek öğretmek ve 
+                        manevi gelişimlerine rehberlik etmek. Tecvidli Kur'an okuma, hafızlık eğitimi ve temel dini 
+                        bilgiler üzerine çalışıyorum. 🌿
+                    </p>
+                    <p class="about-text">{{ anasayfa_alt_metin.icerik|linebreaks }}</p>
+                    <a href="/hakkimda" class="btn btn-primary about-btn">
+                        Daha Fazla Bilgi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hafızlık Rehberi -->
+    <section class="guide-section fade-in-up" id="hafizlik">
+        <h2 class="section-title text-center mb-4">📖 Hafızlık Yolunda İzlenecek Adımlar</h2>
+        <p class="text-center text-muted mb-5">Hafızlık serüveninizde size rehberlik edecek temel prensipler ve tavsiyeler</p>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card guide-card">
+                    <div class="guide-content">
+                        <div class="guide-icon">1</div>
+                        <h3 class="guide-title">Niyet ve İhlas</h3>
+                        <p class="guide-text">Hafızlık yolculuğuna Allah rızası için başlamak en önemli ilk adımdır. Samimi bir niyet ve ihlasla yapılan her iş bereketli olur.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card guide-card">
+                    <div class="guide-content">
+                        <div class="guide-icon">2</div>
+                        <h3 class="guide-title">Doğru Hoca Seçimi</h3>
+                        <p class="guide-text">Tecvid bilgisi kuvvetli, sabırlı ve tecrübeli bir hoca ile çalışmak hafızlık sürecini hem kolaylaştırır hem de keyifli hale getirir.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card guide-card">
+                    <div class="guide-content">
+                        <div class="guide-icon">3</div>
+                        <h3 class="guide-title">Düzenli Tekrar</h3>
+                        <p class="guide-text">Ezberlenen ayet ve surelerin unutulmaması için düzenli tekrar şarttır. Her gün belirli bir zamanı tekrara ayırmak başarıyı garantiler.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card guide-card">
+                    <div class="guide-content">
+                        <div class="guide-icon">4</div>
+                        <h3 class="guide-title">Sabır ve Sebat</h3>
+                        <p class="guide-text">Hafızlık yolculuğu sabır gerektiren uzun bir süreçtir. Karşılaşılan zorluklarda pes etmeden devam etmek başarının anahtarıdır.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card guide-card">
+                    <div class="guide-content">
+                        <div class="guide-icon">5</div>
+                        <h3 class="guide-title">Dua ve İbadet</h3>
+                        <p class="guide-text">Hafızlık yolculuğunda Allah'tan yardım dilemek ve ibadetlere devam etmek manevi olarak güçlü kalmanızı sağlar.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card guide-card">
+                    <div class="guide-content">
+                        <div class="guide-icon">6</div>
+                        <h3 class="guide-title">Zaman Yönetimi</h3>
+                        <p class="guide-text">Düzenli bir program oluşturmak ve zamanı verimli kullanmak hafızlık sürecini daha etkili hale getirir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alıntı -->
+    <section class="fade-in-up">
+        <div class="quote-box">
+            "Kalem, zihnin aynasıdır. Yazdığın senindir, düşündüğün henüz senin değildir."
+            <div class="quote-author">~ Şeyma</div>
+        </div>
+    </section>
+
+    <!-- İstatistikler -->
+    <section class="stats-section fade-in-up">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="stat-number">{{number}}+</div>
+                    <div class="stat-label">Yayınlanan Yazı</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Yıllık Tecrübe</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Font Awesome Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+<script>
+// Animasyon efekti
+document.addEventListener('DOMContentLoaded', function() {
+    const fadeElements = document.querySelectorAll('.fade-in-up');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    fadeElements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+        observer.observe(element);
+    });
+});
+</script>
+{% endblock %}

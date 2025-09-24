@@ -1,0 +1,28 @@
+/* Şeyma Arama Motoru Özel Stilleri */
+body {
+    background-color: #f8f9fa;
+}
+
+.display-4 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+.input-group-lg .form-control {
+    border-radius: 24px 0 0 24px;
+    padding-left: 20px;
+}
+
+.input-group-lg .btn {
+    border-radius: 0 24px 24px 0;
+}
+
+.badge {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.badge:hover {
+    background-color: #e9ecef !important;
+    transform: translateY(-2px);
+}

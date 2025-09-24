@@ -1,0 +1,306 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block page_title %}ŞEYMA - Alıntılar {% endblock %}
+
+{% block css_file %} 
+<style>
+  .quotes-container {
+    padding: 2rem 0;
+  }
+  
+  .page-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--primary-color);
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .quote-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .quote-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+  }
+  
+  .quote-card::before {
+    content: '"';
+    position: absolute;
+    top: 1rem;
+    left: 1.5rem;
+    font-size: 5rem;
+    color: rgba(78, 115, 223, 0.1);
+    font-family: 'Playfair Display', serif;
+    line-height: 1;
+  }
+  
+  .quote-text {
+    font-size: 1.25rem;
+    line-height: 1.7;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .quote-meta {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .quote-author {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+  }
+  
+  .quote-source {
+    color: var(--text-light);
+    font-style: italic;
+  }
+  
+  .quote-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .quote-tag {
+    background: rgba(78, 115, 223, 0.1);
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+  .quote-actions {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+  
+  .btn-sm {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+  }
+  
+  .filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  .filter-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .filter-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  
+  .filter-badge {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: var(--text-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+  }
+  
+  .filter-badge:hover, .filter-badge.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-light);
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dee2e6;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .quote-card {
+      padding: 2rem 1.5rem;
+    }
+    
+    .quote-text {
+      font-size: 1.1rem;
+    }
+    
+    .quote-meta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .quote-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .quotes-container {
+      padding: 1rem 0;
+    }
+    
+    .page-title {
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+    
+    .quote-card {
+      padding: 1.5rem;
+    }
+    
+    .quote-card::before {
+      font-size: 3rem;
+      left: 1rem;
+      top: 0.5rem;
+    }
+    
+    .filter-section {
+      padding: 1.25rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container quotes-container">
+  <h1 class="page-title"><i class="fas fa-quote-left me-2"></i>Değerli Alıntılar</h1>
+  
+  <!-- Filtreleme Bölümü -->
+  <div class="filter-section">
+    <h3 class="filter-title"><i class="fas fa-filter"></i> Kategorilere Göre Filtrele</h3>
+    <div class="filter-badges">
+      <a href="?kategori=tum" class="filter-badge {% if not request.GET.kategori or request.GET.kategori == 'tum' %}active{% endif %}">Tümü</a>
+      <a href="?kategori=dini" class="filter-badge {% if request.GET.kategori == 'dini' %}active{% endif %}">Dini</a>
+      <a href="?kategori=edebi" class="filter-badge {% if request.GET.kategori == 'edebi' %}active{% endif %}">Edebi</a>
+      <a href="?kategori=felsefi" class="filter-badge {% if request.GET.kategori == 'felsefi' %}active{% endif %}">Felsefi</a>
+      <a href="?kategori=siir" class="filter-badge {% if request.GET.kategori == 'siir' %}active{% endif %}">Şiir</a>
+      <a href="?kategori=motivasyon" class="filter-badge {% if request.GET.kategori == 'motivasyon' %}active{% endif %}">Motivasyon</a>
+    </div>
+  </div>
+  
+  <!-- Alıntı Listesi -->
+  {% if alintilar %}
+    {% for alinti in alintilar %}
+    <div class="quote-card">
+      <div class="quote-text">
+        {{ alinti.quote_text }}
+      </div>
+      
+      <div class="quote-meta">
+        <div>
+          {% if alinti.author %}
+          <span class="quote-author">{{ alinti.author }}</span>
+          {% endif %}
+          
+          {% if alinti.source %}
+          <span class="quote-source">, {{ alinti.source }}</span>
+          {% endif %}
+          
+        </div>
+        
+        {% if user.is_authenticated %}
+        <div class="quote-actions">
+          <a href="{% url 'alinti-duzenle' alinti.id %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-edit me-1"></i> Düzenle
+          </a>
+          <a href="{% url 'alinti-sil' alinti.id %}" class="btn btn-outline-danger btn-sm">
+            <i class="fas fa-trash me-1"></i> Sil
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <h3>Henüz alıntı bulunmamaktadır</h3>
+      <p>İlk alıntıyı ekleyin.</p>
+    </div>
+  {% endif %}
+  
+  <!-- Sayfalama -->
+  {% if alintilar.paginator.num_pages > 1 %}
+  <nav aria-label="Sayfalama" class="mt-5">
+    <ul class="pagination justify-content-center">
+      {% if alintilar.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?sayfa={{ alintilar.previous_page_number }}{% if request.GET.kategori %}&kategori={{ request.GET.kategori }}{% endif %}">
+            &laquo; Önceki
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&laquo; Önceki</span>
+        </li>
+      {% endif %}
+      
+      {% for i in alintilar.paginator.page_range %}
+        {% if alintilar.number == i %}
+          <li class="page-item active">
+            <span class="page-link">{{ i }}</span>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?sayfa={{ i }}{% if request.GET.kategori %}&kategori={{ request.GET.kategori }}{% endif %}">{{ i }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      
+      {% if alintilar.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?sayfa={{ alintilar.next_page_number }}{% if request.GET.kategori %}&kategori={{ request.GET.kategori }}{% endif %}">
+            Sonraki &raquo;
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Sonraki &raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

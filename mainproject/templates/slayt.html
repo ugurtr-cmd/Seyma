@@ -1,0 +1,26 @@
+{% extends "layout_admin.html" %}
+
+{% load static %}
+{% block title %}Öğrenciler | Şeyma {% endblock title %} 
+{% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">{% endblock css_file %}
+{% block content %}
+        <!-- Main Content -->
+    <div class="main-panel">
+
+       <!-- AI Slayt Oluşturucu -->
+      <div class="section-box">
+        <h4>🧠 AI Slayt Oluşturucu</h4>
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Konu Başlığı</label>
+            <input type="text" class="form-control" placeholder="Örn: Güneş Sistemi">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Slayt Sayısı</label>
+            <input type="number" class="form-control" placeholder="Örn: 5">
+          </div>
+          <button class="btn btn-primary">Slayt Oluştur</button>
+        </form>
+      </div>
+
+{% endblock content %}

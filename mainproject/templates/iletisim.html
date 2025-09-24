@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block page_title %}ŞEYMA - İletişim {% endblock %}
+
+{% block css_file %} 
+<link rel="stylesheet" href="{% static 'mainproject/css/style.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .contact-form {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .contact-info {
+        background-color: #4e73df;
+        color: white;
+        border-radius: 10px;
+        padding: 30px;
+    }
+    .contact-icon {
+        font-size: 1.5rem;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h2 class="section-title text-center mb-4"><i class="fas fa-envelope me-2"></i>İletişim</h2>
+            
+            <div class="row">
+                <div class="col-md-7 mb-4">
+                    <div class="contact-form">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Adınız Soyadınız</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">E-posta Adresiniz</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Mesajınız</label>
+                                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-2">
+                                <i class="fas fa-paper-plane me-2"></i>Gönder
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="col-md-5 mb-4">
+                    <div class="contact-info h-100">
+                        <h4 class="mb-4"><i class="fas fa-info-circle contact-icon"></i>İletişim Bilgileri</h4>
+                        
+                        <div class="mb-4">
+                            <p><i class="fas fa-map-marker-alt contact-icon"></i> <strong>Adres:</strong></p>
+                            <p> Türkiye</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p><i class="fas fa-phone-alt contact-icon"></i> <strong>Telefon:</strong></p>
+                            <p>+90</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p><i class="fas fa-envelope contact-icon"></i> <strong>E-posta:</strong></p>
+                            <p>seymailetisim@yandex.com</p>
+                        </div>
+                        
+                        <div class="social-links mt-4">
+                            <a href="#" class="text-white me-3"><i class="fab fa-whatsapp fa-2x"></i></a>
+                            <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-2x"></i></a>
+                            <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-2x"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,419 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block page_title %}ŞEYMA - Blog{% endblock %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'mainproject/css/style.css' %}">
+<style>
+  :root {
+    --primary-color: #6c5ce7;
+    --primary-light: #a29bfe;
+    --primary-dark: #5649c9;
+    --text-dark: #2d3436;
+    --text-light: #636e72;
+    --bg-light: #f8f9fa;
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    --transition: all 0.3s ease;
+  }
+  
+  .blog-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+    background: linear-gradient(135deg, #f6f9fc, #ffffff);
+    border-radius: 16px;
+  }
+  
+  .blog-title {
+    color: var(--text-dark);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+  }
+  
+  .blog-subtitle {
+    color: var(--text-light);
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .categories-container {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  
+  .categories-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+  
+  .category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+  
+  .category-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+  
+  .category-btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+  }
+  
+  .category-btn-outline {
+    border: 2px solid var(--primary-light);
+    color: var(--primary-color);
+    background: transparent;
+  }
+  
+  .category-btn-outline:hover {
+    background: var(--primary-light);
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  .posts-container {
+    margin-bottom: 3rem;
+  }
+  
+  .section-title {
+    position: relative;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    color: var(--text-dark);
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+  }
+  
+  .section-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-light), var(--primary-color));
+    border-radius: 2px;
+  }
+  
+  .post-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    height: 100%;
+  }
+  
+  .post-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  }
+  
+  .card-img-container {
+    height: 250px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .card-img-top {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .post-card:hover .card-img-top {
+    transform: scale(1.05);
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 250px);
+  }
+  
+  .card-title {
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    line-height: 1.4;
+  }
+  
+  .card-text {
+    color: var(--text-light);
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  .card-footer {
+    background: transparent;
+    border-top: none;
+    padding: 0 1.5rem 1.5rem;
+  }
+  
+  .btn-read-more {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  .btn-read-more:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  .btn-edit {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: var(--transition);
+    border: none;
+  }
+  
+  .btn-edit:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    color: white;
+  }
+  
+  .no-posts {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  
+  .no-posts-icon {
+    font-size: 4rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+  }
+  
+  .pagination {
+    margin-top: 3rem;
+  }
+  
+  .page-link {
+    border: none;
+    color: var(--text-dark);
+    padding: 0.7rem 1.2rem;
+    border-radius: 10px;
+    margin: 0 0.3rem;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  .page-link:hover {
+    background: var(--primary-light);
+    color: white;
+  }
+  
+  .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+  }
+  
+  .page-item.disabled .page-link {
+    color: #adb5bd;
+  }
+  
+  /* Responsive tasarım */
+  @media (max-width: 768px) {
+    .blog-title {
+      font-size: 2rem;
+    }
+    
+    .blog-subtitle {
+      font-size: 1rem;
+    }
+    
+    .section-title {
+      font-size: 1.7rem;
+    }
+    
+    .card-img-container {
+      height: 200px;
+    }
+    
+    .category-buttons {
+      gap: 0.5rem;
+    }
+    
+    .category-btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .blog-header {
+      padding: 1.5rem 0;
+    }
+    
+    .blog-title {
+      font-size: 1.8rem;
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+    }
+    
+    .btn-read-more, .btn-edit {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+  <!-- Blog Başlık -->
+  <div class="blog-header">
+    <h1 class="blog-title">Şeyma'nın Blogu</h1>
+    <p class="blog-subtitle">Kişisel düşüncelerim, deneyimlerim ve öğrendiklerim üzerine yazılar</p>
+  </div>
+  
+  <!-- Kategoriler -->
+  <div class="categories-container">
+    <h3 class="categories-title">📂 Kategoriler</h3>
+    <div class="category-buttons">
+      {% for kategori in kategoriler %}
+        {% if selectCategory == kategori.slug %}
+          <a href="{% url 'kategori' kategori.slug %}" class="category-btn category-btn-primary">{{kategori.name}}</a>
+        {% else %}
+          <a href="{% url 'kategori' kategori.slug %}" class="category-btn category-btn-outline">{{kategori.name}}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Yazılar -->
+  <div class="posts-container">
+    <h2 class="section-title">📝 Tüm Blog Yazıları</h2>
+    
+    {% if yazilar %}
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for yazi in yazilar %}
+          <div class="col">
+            <div class="post-card card h-100">
+              {% if yazi.imageUrl %}
+                <div class="card-img-container">
+                  <img src="{{ yazi.imageUrl.url }}" class="card-img-top" alt="{{ yazi.title }}">
+                </div>
+              {% else %}
+                <div class="card-img-container bg-light d-flex align-items-center justify-content-center">
+                  <i class="fas fa-image fa-3x text-muted"></i>
+                </div>
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{ yazi.title|safe }}</h5>
+                <p class="card-text">
+                  {{ yazi.description|striptags|truncatechars:120|safe }}
+                </p>
+              </div>
+              <div class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                  <a href="{% url 'detay' yazi.slug %}" class="btn-read-more">
+                    <i class="fas fa-book-reader me-1"></i> Devamını Oku
+                  </a>
+                  {% if user.is_authenticated %}
+                    <a href="{% url 'yazi-guncelle' yazi.id %}" class="btn-edit">
+                      <i class="fas fa-edit me-1"></i> Düzenle
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-posts">
+        <div class="no-posts-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h4>Bu kategoride henüz yazı bulunmuyor</h4>
+        <p class="text-muted">Diğer kategorilere göz atmayı deneyebilirsiniz</p>
+      </div>
+    {% endif %}
+  </div>
+  
+  <!-- Sayfalama -->
+  {% if yazilar.paginator.num_pages > 1 %}
+    <nav aria-label="Sayfalama" class="d-flex justify-content-center">
+      <ul class="pagination">
+        {% if yazilar.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ yazilar.previous_page_number }}" aria-label="Önceki">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+          </li>
+        {% endif %}
+
+        {% for i in yazilar.paginator.page_range %}
+          {% if yazilar.number == i %}
+            <li class="page-item active" aria-current="page">
+              <span class="page-link">{{ i }}</span>
+            </li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+        
+        {% if yazilar.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ yazilar.next_page_number }}" aria-label="Sonraki">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">&raquo;</span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+
+<!-- Font Awesome -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock %}

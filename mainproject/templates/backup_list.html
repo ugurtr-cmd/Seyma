@@ -1,0 +1,312 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Veri Yedekleme | Şeyma{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Başlık Bölümü -->
+    <div class="page-header" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; color: white; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h1 class="page-title mb-1">
+                    <i class="fas fa-database me-2"></i> Veri Yedekleme ve Geri Yükleme
+                </h1>
+                <p class="mb-0 opacity-75">Sistem verilerinizi yedekleyin veya önceki yedeklerinizi geri yükleyin</p>
+            </div>
+            <div class="d-flex mt-2">
+                <a href="{% url 'backup_data' %}" class="btn btn-light me-2">
+                    <i class="fas fa-plus-circle me-1"></i> Yeni Yedek Oluştur
+                </a>
+                <a href="{% url 'admin-dashboard' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i> Geri Dön
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- İki Sütunlu Düzen -->
+    <div class="row">
+        <!-- Geri Yükleme Bölümü -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-3 border-0">
+                    <h5 class="card-title mb-0"><i class="fas fa-upload me-2"></i> Yedekten Geri Yükle</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'restore_data' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Yedek ZIP Dosyası Seçin</label>
+                            <div class="file-upload-area border rounded p-4 text-center">
+                                <i class="fas fa-file-archive display-4 text-muted mb-3"></i>
+                                <p class="text-muted mb-2">ZIP yedek dosyasını sürükleyip bırakın veya</p>
+                                <input type="file" id="backupFileInput" class="form-control d-none" name="backup_file" accept=".zip" required>
+                                <label for="backupFileInput" class="btn btn-outline-primary">
+                                    <i class="fas fa-folder-open me-1"></i> Dosya Seç
+                                </label>
+                                <div id="fileName" class="mt-2 small text-muted"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100 py-2 fw-semibold">
+                            <i class="fas fa-upload me-1"></i> Geri Yükleme İşlemini Başlat
+                        </button>
+                    </form>
+                    
+                    <div class="alert alert-warning mt-4">
+                        <div class="d-flex">
+                            <div class="me-2">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <strong>Önemli Uyarı:</strong> Geri yükleme işlemi mevcut tüm verilerinizin üzerine yazacaktır. 
+                                Bu işlem geri alınamaz, lütfen işlem öncesinde mutlaka yeni bir yedek oluşturun.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <div class="d-flex">
+                            <div class="me-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- İstatistikler ve Bilgi -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-info text-white py-3 border-0">
+                    <h5 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i> Yedekleme İstatistikleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center mb-4">
+                        <div class="col-4">
+                            <div class="border-end">
+                                <h2 class="text-primary mb-0">{{ backups|length }}</h2>
+                                <p class="text-muted mb-0">Toplam Yedek</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border-end">
+                                <h2 class="text-success mb-0">{{ total_size|filesizeformat }}</h2>
+                                <p class="text-muted mb-0">Toplam Boyut</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <h2 class="text-warning mb-0">{{ photo_count }}</h2>
+                            <p class="text-muted mb-0">Toplam Fotoğraf</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light p-3 rounded">
+                        <h6 class="mb-3"><i class="fas fa-lightbulb me-2 text-warning"></i> Yedekleme İpuçları</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Tek tıkla tam yedek: Veriler + Fotoğraflar</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Otomatik geri yükleme: ZIP içinden her şey</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Düzenli yedek alarak veri kaybı riskini azaltın</li>
+                            <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i> Önemli değişiklikler öncesinde mutlaka yedek alın</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6 class="mb-2"><i class="fas fa-question-circle me-2 text-primary"></i> Nasıl Çalışır?</h6>
+                        <div class="small text-muted">
+                            <p class="mb-1">1. Yedekleme: Tüm veriler + fotoğraflar ZIP içinde</p>
+                            <p class="mb-1">2. Geri Yükleme: ZIP'i seç → Otomatik yükleme</p>
+                            <p class="mb-0">3. Sistem her şeyi otomatik olarak halleder</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mevcut Yedekler -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="card-title mb-0"><i class="fas fa-history me-2"></i> Mevcut Yedekler</h5>
+        </div>
+        <div class="card-body">
+            {% if backups %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Dosya Adı</th>
+                            <th>Oluşturulma Tarihi</th>
+                            <th>Boyut</th>
+                            <th>İçerik</th>
+                            <th class="text-end">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backup in backups %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-file-archive text-primary me-2"></i>
+                                    <span>{{ backup.filename }}</span>
+                                </div>
+                            </td>
+                            <td>{{ backup.date|date:"d.m.Y H:i" }}</td>
+                            <td>{{ backup.size|filesizeformat }}</td>
+                            <td>
+                                <span class="badge bg-info">ZIP</span>
+                                <span class="badge bg-success">Veriler</span>
+                                <span class="badge bg-warning">Fotoğraflar</span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    <a href="{% url 'download_backup' backup.filename %}" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-download me-1"></i> İndir
+                                    </a>
+                                    <form method="post" action="{% url 'delete_backup' backup.filename %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('Bu yedeği silmek istediğinize emin misiniz?')">
+                                            <i class="fas fa-trash-alt me-1"></i> Sil
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-database text-muted" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-muted">Henüz hiç yedek bulunmamaktadır</h5>
+                <p class="text-muted">İlk yedeğinizi oluşturmak için "Yeni Yedek Oluştur" butonuna tıklayın</p>
+                <a href="{% url 'backup_data' %}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle me-1"></i> Yeni Yedek Oluştur
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+    .file-upload-area {
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6 !important;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-area:hover {
+        background-color: #e9ecef;
+        border-color: #4e73df !important;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+    
+    .alert-warning {
+        border: none;
+        border-radius: 10px;
+        background-color: rgba(255, 193, 7, 0.15);
+    }
+    
+    .alert-info {
+        border: none;
+        border-radius: 10px;
+        background-color: rgba(23, 162, 184, 0.15);
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .badge {
+        font-size: 0.75em;
+        padding: 0.35em 0.65em;
+    }
+</style>
+
+<script>
+    // Dosya yükleme alanı için JavaScript
+    document.getElementById('backupFileInput').addEventListener('change', function(e) {
+        const fileNameElement = document.getElementById('fileName');
+        if (this.files.length > 0) {
+            fileNameElement.textContent = 'Seçilen dosya: ' + this.files[0].name;
+            fileNameElement.className = 'mt-2 small text-success fw-semibold';
+        } else {
+            fileNameElement.textContent = '';
+        }
+    });
+    
+    // Sürükle bırak işlevselliği
+    const fileUploadArea = document.querySelector('.file-upload-area');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventname, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileUploadArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+        fileUploadArea.style.borderColor = '#4e73df';
+        fileUploadArea.style.backgroundColor = '#e9ecef';
+    }
+    
+    function unhighlight() {
+        fileUploadArea.style.borderColor = '#dee2e6';
+        fileUploadArea.style.backgroundColor = '#f8f9fa';
+    }
+    
+    fileUploadArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        const input = document.getElementById('backupFileInput');
+        input.files = files;
+        
+        const fileNameElement = document.getElementById('fileName');
+        if (files.length > 0) {
+            fileNameElement.textContent = 'Seçilen dosya: ' + files[0].name;
+            fileNameElement.className = 'mt-2 small text-success fw-semibold';
+        }
+    }
+</script>
+{% endblock %}

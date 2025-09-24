@@ -1,0 +1,772 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şeyma - AI Sohbet</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --primary-dark: #3a56c4;
+            --accent-color: #ff6b6b;
+            --text-color: #2d3748;
+            --text-light: #718096;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: calc(100vh - 30px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            text-align: center;
+            padding: 1.5rem 0;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        .logo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 1;
+            line-height: 1.1;
+        }
+        
+        .logo-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Search Form */
+        .search-form {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .search-input {
+            border-radius: 25px;
+            border: 2px solid transparent;
+            padding: 16px 20px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.15);
+            outline: none;
+            transform: translateY(-2px);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+            transition: var(--transition);
+        }
+        
+        .search-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 8px 20px rgba(78, 115, 223, 0.4);
+        }
+        
+        /* Loading */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+        
+        .spinner-border {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-width: 3px;
+        }
+        
+        /* Results */
+        .results-container {
+            margin-bottom: 2rem;
+        }
+        
+        .result-card {
+            border-radius: 20px;
+            border: none;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            transition: var(--transition);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .result-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        
+        .result-body {
+            padding: 2rem 1.5rem;
+            background: transparent;
+        }
+        
+        .result-footer {
+            background: rgba(248, 249, 250, 0.9);
+            padding: 1rem 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        
+        .cevap-container {
+            line-height: 1.7;
+            font-size: 1.05rem;
+            color: var(--text-color);
+        }
+        
+        .cevap-container ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .cevap-container li {
+            margin-bottom: 0.6rem;
+            padding-left: 0.5rem;
+            position: relative;
+        }
+        
+        .cevap-container li::before {
+            content: '•';
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: -1rem;
+        }
+        
+        .cevap-container strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        /* Examples Section */
+        .examples-section {
+            margin-bottom: 2rem;
+        }
+        
+        .examples-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .example-question {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid transparent;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+        }
+        
+        .example-question:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(78, 115, 223, 0.25);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+        }
+        
+        .info-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .info-text {
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .float {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        /* Responsive Design - ÖZELLİKLE MOBİL İÇİN */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .main-container {
+                max-width: 100%;
+                min-height: calc(100vh - 24px);
+            }
+            
+            .logo-section {
+                padding: 1rem 0;
+                margin-bottom: 0.5rem;
+            }
+            
+            .logo-title {
+                font-size: 3rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .logo-subtitle {
+                font-size: 1rem;
+            }
+            
+            .logo-section::before {
+                width: 80px;
+                height: 80px;
+                top: -15px;
+            }
+            
+            .search-input {
+                padding: 14px 18px;
+                font-size: 15px;
+            }
+            
+            .search-btn {
+                width: 40px;
+                height: 40px;
+                right: 5px;
+            }
+            
+            .example-grid {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+            
+            .result-body {
+                padding: 1.5rem;
+            }
+            
+            .info-box {
+                padding: 1.5rem;
+            }
+            
+            .examples-title {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .example-question {
+                padding: 0.9rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .logo-title {
+                font-size: 2.5rem;
+            }
+            
+            .logo-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .logo-section::before {
+                width: 60px;
+                height: 60px;
+                top: -10px;
+            }
+            
+            .search-input {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .search-btn {
+                width: 36px;
+                height: 36px;
+                right: 4px;
+            }
+            
+            .search-btn i {
+                font-size: 0.9rem;
+            }
+            
+            .result-header {
+                padding: 1rem;
+                font-size: 0.95rem;
+            }
+            
+            .result-body {
+                padding: 1.2rem;
+            }
+            
+            .result-footer {
+                padding: 0.8rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .cevap-container {
+                font-size: 0.95rem;
+            }
+            
+            .info-box {
+                padding: 1.2rem;
+            }
+            
+            .info-title {
+                font-size: 1.1rem;
+            }
+            
+            .info-text {
+                font-size: 0.9rem;
+            }
+            
+            .examples-title {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .logo-title {
+                font-size: 2.2rem;
+            }
+            
+            .logo-subtitle {
+                font-size: 0.85rem;
+            }
+            
+            .search-input {
+                padding: 11px 14px;
+                font-size: 13px;
+            }
+            
+            .search-btn {
+                width: 34px;
+                height: 34px;
+            }
+            
+            .result-header {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .result-body {
+                padding: 1rem;
+            }
+            
+            .example-question {
+                padding: 0.8rem 0.9rem;
+                font-size: 0.85rem;
+            }
+            
+            .info-box {
+                padding: 1rem;
+            }
+        }
+        
+        /* Çok küçük ekranlar için ekstra ayarlar */
+        @media (max-width: 320px) {
+            .logo-title {
+                font-size: 2rem;
+            }
+            
+            .search-input {
+                padding: 10px 12px;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                gap: 0.3rem;
+                text-align: center;
+            }
+            
+            .result-header .badge {
+                margin: 0.3rem 0 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="content-wrapper">
+            <!-- Logo Section -->
+            <div class="logo-section fade-in-up">
+                <h1 class="logo-title">Şeyma</h1>
+                <p class="logo-subtitle">Kur'an Öğretmeni & Hafız</p>
+            </div>
+            
+            <!-- Search Form -->
+            <div class="search-form fade-in-up">
+                <form method="POST" id="arama-formu">
+                    {% csrf_token %}
+                    <div class="position-relative">
+                        <input type="text" name="sorgu" class="form-control search-input" 
+                               placeholder="Şeyma'ya soru sor..." 
+                               value="{{ sorgu|default:'' }}" 
+                               autocomplete="off" id="sorgu-input" required>
+                        <button class="btn search-btn" type="submit" id="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <div id="loading-spinner" class="loading-spinner">
+                <div class="spinner-border text-white" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                <p class="mt-3 text-white">Şeyma düşünüyor...</p>
+            </div>
+            
+            <!-- Results -->
+            <div id="sonuclar" class="results-container">
+                {% if cevap %}
+                <div class="result-card fade-in-up">
+                    <div class="result-header">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Soru: "{{ sorgu }}"</span>
+                        {% if cached %}
+                        <span class="badge bg-light text-primary ms-2">Önbellekten</span>
+                        {% endif %}
+                    </div>
+                    <div class="result-body">
+                        <div class="cevap-container">
+                            {{ cevap|safe }}
+                        </div>
+                    </div>
+                    <div class="result-footer">
+                        <i class="fas fa-info-circle"></i>
+                        Şeyma'nın bilgi ve tecrübesiyle cevaplanmıştır
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Example Questions -->
+            <div class="examples-section fade-in-up">
+                <h4 class="examples-title">💡 Hemen Sorabilecekleriniz</h4>
+                <div class="example-grid">
+                    <div class="example-question">Kur'an öğrenmeye nasıl başlayabilirim?</div>
+                    <div class="example-question">Hafızlık için tavsiyelerin neler?</div>
+                    <div class="example-question">İbadetlerimi nasıl düzene sokabilirim?</div>
+                    <div class="example-question">Motivasyonumu nasıl yüksek tutarım?</div>
+                </div>
+            </div>
+            
+            <!-- Info Box -->
+            <div class="info-box fade-in-up">
+                <h5 class="info-title">
+                    <i class="fas fa-robot float"></i>
+                    AI Destekli Yanıt Sistemi
+                </h5>
+                <p class="info-text">
+                    Şeyma, Kur'an öğretmenliği ve hafızlık tecrübesiyle size en doğru bilgileri sunar. 
+                    Sorularınızı çekinmeden sorabilirsiniz! Her sorunuz özenle cevaplanır ve kişiselleştirilmiş
+                    tavsiyeler alırsınız.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('arama-formu');
+        const input = document.getElementById('sorgu-input');
+        const resultsDiv = document.getElementById('sonuclar');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const sorgu = input.value.trim();
+            if (!sorgu) return;
+            
+            // Yükleniyor göster, sonuçları temizle
+            loadingSpinner.style.display = 'block';
+            resultsDiv.innerHTML = '';
+            submitBtn.disabled = true;
+            
+            // AJAX isteği gönder
+            fetch('{% url "arama_motoru" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({sorgu: sorgu})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error || 'HTTP error, status = ' + response.status);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                loadingSpinner.style.display = 'none';
+                submitBtn.disabled = false;
+                
+                if (data.error) {
+                    resultsDiv.innerHTML = `
+                        <div class="result-card fade-in-up">
+                            <div class="result-header bg-danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Hata</span>
+                            </div>
+                            <div class="result-body">
+                                <div class="cevap-container">${data.error}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    let cachedBadge = data.cached ? '<span class="badge bg-light text-primary ms-2">Önbellekten</span>' : '';
+                    
+                    resultsDiv.innerHTML = `
+                        <div class="result-card fade-in-up">
+                            <div class="result-header">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Soru: "${data.sorgu}"</span>
+                                ${cachedBadge}
+                            </div>
+                            <div class="result-body">
+                                <div class="cevap-container">${data.cevap}</div>
+                            </div>
+                            <div class="result-footer">
+                                <i class="fas fa-info-circle"></i>
+                                Şeyma'nın bilgi ve tecrübesiyle cevaplanmıştır
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Sonuçları gösterdikten sonra sayfayı kaydır
+                    setTimeout(() => {
+                        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 300);
+                }
+            })
+            .catch(error => {
+                loadingSpinner.style.display = 'none';
+                submitBtn.disabled = false;
+                resultsDiv.innerHTML = `
+                    <div class="result-card fade-in-up">
+                        <div class="result-header bg-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Hata</span>
+                        </div>
+                        <div class="result-body">
+                            <div class="cevap-container">${error.message}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+        
+        // Örnek sorulara tıklanınca arama yapma
+        document.querySelectorAll('.example-question').forEach(badge => {
+            badge.addEventListener('click', function() {
+                input.value = this.textContent;
+                form.dispatchEvent(new Event('submit'));
+            });
+        });
+        
+        // Input'a odaklan
+        input.focus();
+        
+        // Sayfa yüklendiğinde input'a odaklan
+        setTimeout(() => {
+            input.focus();
+        }, 500);
+        
+        // CSRF token almak için yardımcı fonksiyon
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Animasyonları başlat
+        const animateElements = document.querySelectorAll('.fade-in-up');
+        animateElements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.1}s`;
+        });
+        
+        // Mobil cihaz kontrolü
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+        }
+        
+        if (isMobileDevice()) {
+            document.body.classList.add('mobile-device');
+        }
+    });
+    </script>
+</body>
+</html>

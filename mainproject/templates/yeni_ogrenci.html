@@ -1,0 +1,1090 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Yeni Öğrenci Ekle | Şeyma{% endblock %}
+
+{% block css_file %}
+<link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --primary-dark: #2e59d9;
+        --secondary-color: #6f42c1;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-bg: #f8f9fc;
+        --text-dark: #5a5c69;
+        --text-light: #858796;
+        --border-color: #e3e6f0;
+        --transition: all 0.3s ease;
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+        background-color: var(--light-bg);
+        min-height: calc(100vh - 70px);
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .page-title {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin: 0;
+    }
+    
+    .back-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding: 0.8rem 1.2rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0.15rem 0.5rem rgba(58, 59, 69, 0.1);
+        transition: var(--transition);
+    }
+    
+    .back-button:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .form-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.3rem;
+        margin: 2.5rem 0 1.5rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #252121ff;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .required-field::after {
+        content: "*";
+        color: var(--danger-color);
+        margin-left: 0.25rem;
+    }
+    
+    .form-control, .form-select, .form-textarea {
+        border-radius: 8px;
+        border: 2px solid var(--border-color);
+        padding: 0.9rem;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        width: 100%;
+    }
+    
+    .form-control:focus, .form-select:focus, .form-textarea:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.3rem rgba(78, 115, 223, 0.25);
+        outline: none;
+    }
+    
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .file-input-container {
+        position: relative;
+    }
+    
+    .file-input-info {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        font-size: 1.1rem;
+        padding: 1.2rem 2.5rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.8rem 1.5rem rgba(78, 115, 223, 0.3);
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--text-light), #6c757d);
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(108, 117, 125, 0.25);
+    }
+    
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid var(--border-color);
+    }
+    
+    /* Dersler için grid */
+    .ders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .ders-karti {
+        background: var(--light-bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+        transition: var(--transition);
+    }
+    
+    .ders-karti:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(78, 115, 223, 0.15);
+    }
+    
+    .ders-baslik {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding-bottom: 0.7rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+    
+    /* Sınav ekleme/çıkarma butonları */
+    .sinav-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .sinav-ekle-btn, .sinav-kaldir-btn {
+        background-color: var(--info-color);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .sinav-ekle-btn:hover {
+        background-color: #2c9faf;
+    }
+    
+    .sinav-kaldir-btn {
+        background-color: var(--danger-color);
+    }
+    
+    .sinav-kaldir-btn:hover {
+        background-color: #c0352b;
+    }
+    
+    .sinav-ekle-btn:disabled, .sinav-kaldir-btn:disabled {
+        background-color: var(--text-light);
+        cursor: not-allowed;
+    }
+    
+    /* Ezberler için düzenleme */
+    .ezber-section {
+        margin-bottom: 2rem;
+    }
+    
+    .ezber-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .ezber-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .ezber-item {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem;
+        background: var(--light-bg);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 2px solid var(--border-color);
+        position: relative;
+    }
+    
+    .ezber-item:hover {
+        border-color: var(--secondary-color);
+    }
+    
+    .ezber-item.active {
+        border-color: var(--secondary-color);
+        background-color: rgba(111, 66, 193, 0.1);
+    }
+    
+    .ezber-item.tamamlandi {
+        border-color: var(--success-color);
+        background-color: rgba(28, 200, 138, 0.1);
+    }
+    
+    .ezber-item.devam {
+        border-color: var(--info-color);
+        background-color: rgba(54, 185, 204, 0.1);
+    }
+    
+    .tamamlandi-isareti {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: var(--success-color);
+    }
+    
+    .ezber-detail-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .ezber-detail-card {
+        background: var(--light-bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+        display: none;
+    }
+    
+    .ezber-detail-card.active {
+        display: block;
+    }
+    
+    .ezber-detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+    
+    .ezber-progress {
+        margin-bottom: 1.5rem;
+    }
+    
+    .progress-bar {
+        height: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background-color: var(--success-color);
+        border-radius: 5px;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .ezber-dates {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Elif Ba için kompakt düzen */
+    .compact-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+    
+    .ezber-detail-card.compact {
+        padding: 1.2rem;
+    }
+    
+    .ezber-detail-card.compact .ezber-detail-header {
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    .ezber-detail-card.compact .form-group {
+        margin-bottom: 0.8rem;
+    }
+    
+    .ezber-detail-card.compact .ezber-dates {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .ezber-detail-card.compact .ezber-dates .form-group {
+        margin-bottom: 0;
+    }
+    
+    .ezber-detail-card.compact .ezber-dates .form-control {
+        padding: 0.7rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Durum değişikliği için animasyon */
+    .status-updated {
+        background-color: rgba(28, 200, 138, 0.1) !important;
+        transition: all 0.3s ease;
+    }
+    
+    .error-message {
+        color: var(--danger-color);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .success-message {
+        background: linear-gradient(135deg, var(--success-color), #17a673);
+        color: white;
+        padding: 1.2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1.1rem;
+    }
+    
+    /* Seviye bilgilendirme */
+    .seviye-info {
+        background-color: rgba(78, 115, 223, 0.1);
+        border-left: 4px solid var(--primary-color);
+        padding: 1rem;
+        margin-top: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+    
+    /* Sınav puanı için düzenleme */
+    .sinav-puan-input {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .sinav-puan-input .form-control {
+        flex: 1;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .ders-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+        
+        .form-container {
+            padding: 1.5rem;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+        
+        .ezber-selector {
+            grid-template-columns: 1fr;
+        }
+        
+        .ezber-detail-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .compact-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .button-group {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+        
+        .ezber-detail-card.compact .ezber-dates {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .ezber-detail-card.compact .ezber-dates {
+            grid-template-columns: 1fr;
+        }
+        
+        .ezber-detail-card {
+            padding: 1rem;
+        }
+        
+        .ezber-detail-card.compact {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Sayfa Başlığı -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-user-plus"></i> Yeni Öğrenci Ekle
+        </h1>
+    </div>
+    
+    <!-- Geri Dönüş Butonu -->
+    <a href="{% url 'ogrenci_listesi' %}" class="back-button">
+        <i class="fas fa-arrow-left"></i> Öğrenci Listesine Dön
+    </a>
+    
+    <!-- Hata Mesajları -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i> {{ message }}
+            </div>
+            {% elif message.tags == 'success' %}
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i> {{ message }}
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+    <!-- Öğrenci Ekleme Formu -->
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data" id="ogrenciForm">
+            {% csrf_token %}
+            
+            <!-- TEMEL BİLGİLER -->
+            <h2 class="section-title">
+                <i class="fas fa-user-circle"></i> Temel Bilgiler
+            </h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label required-field">
+                        <i class="fas fa-signature"></i> Ad Soyad
+                    </label>
+                    <input type="text" class="form-control" name="ad_soyad" required 
+                           placeholder="Öğrencinin adı ve soyadı">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-graduation-cap"></i> Seviye
+                    </label>
+                    <select class="form-select" name="seviye" disabled>
+                        {% for key, value in seviyeler %}
+                            <option value="{{ key }}" {% if key == 'HAZ1' %}selected{% endif %}>{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="seviye-info">
+                        <i class="fas fa-info-circle"></i> Seviye, öğrencinin ezber durumuna göre otomatik olarak belirlenecektir.
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-camera"></i> Profil Fotoğrafı
+                    </label>
+                    <div class="file-input-container">
+                        <input type="file" class="form-control" name="profil_foto" accept="image/*">
+                        <div class="file-input-info">
+                            <i class="fas fa-info-circle"></i> JPEG, PNG veya JPG formatında yükleyin
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-sticky-note"></i> Özel Notlar
+                </label>
+                <textarea class="form-textarea" name="ozel_notlar" rows="4" 
+                          placeholder="Öğrenci hakkında özel notlar..."></textarea>
+            </div>
+            
+            <!-- SINAV PUANLARI -->
+            <h2 class="section-title">
+                <i class="fas fa-file-alt"></i> Sınav Puanları
+            </h2>
+            
+            <div class="ders-grid">
+                {% for ders in tum_dersler %}
+                <div class="ders-karti">
+                    <div class="ders-baslik">
+                        <i class="fas fa-book"></i> {{ ders.get_tur_display }}
+                    </div>
+                    
+                    <div id="sinav-container-{{ ders.id }}">
+                        <div class="form-group sinav-grup" id="sinav-grup-{{ ders.id }}-1">
+                            <label class="form-label">
+                                <i class="fas fa-file-alt"></i> Sınav Puanı (0-100)
+                            </label>
+                            <div class="sinav-puan-input">
+                                <input type="number" class="form-control" name="sinav_puan_{{ ders.id }}_1" 
+                                       min="0" max="100" value="0" placeholder="Puan">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sinav-actions">
+                        <button type="button" class="sinav-ekle-btn" data-ders-id="{{ ders.id }}">
+                            <i class="fas fa-plus"></i> Sınav Ekle
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- EZBER DURUMLARI -->
+            <h2 class="section-title">
+                <i class="fas fa-quran"></i> Ezber Durumları
+            </h2>
+            
+            <div class="ezber-section">
+                <div class="ezber-header">
+                    <h3>Ezber Süreleri</h3>
+                    <button type="button" class="btn btn-secondary btn-sm" id="toggleAllEzber">
+                        <i class="fas fa-eye"></i> Tüm Detayları Aç/Kapat
+                    </button>
+                </div>
+                
+                <div class="ezber-selector" id="ezberSelector">
+                    {% for ezber in tum_ezberler %}
+                    <div class="ezber-item" data-ezber-id="{{ ezber.id }}">
+                        <span style="margin-right: 5px; color: green;">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                        
+                        <label style="cursor: pointer; margin: 0; flex: 1;">
+                            {{ ezber.sira }}. {{ ezber.ad }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Ezber Detayları -->
+                <div class="ezber-detail-container" id="ezberDetailContainer">
+                    {% for ezber in tum_ezberler %}
+                    <div class="ezber-detail-card" id="detail_{{ ezber.id }}">
+                        <div class="ezber-detail-header">
+                            <h4>{{ ezber.sira }}. {{ ezber.ad }} Detayları</h4>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEzberDetail('{{ ezber.id }}')">
+                                <i class="fas fa-times"></i> Kapat
+                            </button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tasks"></i> Durum
+                            </label>
+                            <select class="form-select" name="ezber_durum_{{ ezber.id }}" onchange="handleEzberStatusChange('{{ ezber.id }}', this.value)">
+                                <option value="BASLAMADI" selected>Başlamadı</option>
+                                <option value="DEVAM">Devam Ediyor</option>
+                                <option value="TAMAMLANDI">Tamamlandı</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ezber-progress">
+                            <label class="form-label">
+                                <i class="fas fa-chart-line"></i> İlerleme Durumu (%)
+                            </label>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill_{{ ezber.id }}" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span>0%</span>
+                                <span id="progressPercentage_{{ ezber.id }}">0%</span>
+                                <span>100%</span>
+                            </div>
+                            <input type="range" class="form-control" id="progress_{{ ezber.id }}" name="ezber_ilerleme_{{ ezber.id }}" 
+                                   min="0" max="100" value="0" 
+                                   oninput="updateProgress('{{ ezber.id }}', this.value)">
+                        </div>
+                        
+                        <div class="ezber-dates">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-plus"></i> Başlama Tarihi
+                                </label>
+                                <input type="date" class="form-control" name="ezber_baslama_{{ ezber.id }}" id="baslama_{{ ezber.id }}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-check"></i> Bitiş Tarihi
+                                </label>
+                                <input type="date" class="form-control" name="ezber_bitis_{{ ezber.id }}" id="bitis_{{ ezber.id }}">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-comment"></i> Yorum
+                            </label>
+                            <textarea class="form-control" name="ezber_yorum_{{ ezber.id }}" 
+                                      rows="2" placeholder="Ezber hakkında yorum..."></textarea>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- ELİF BA EZBER DURUMLARI -->
+            <h2 class="section-title">
+                <i class="fas fa-book-open"></i> Elif Ba Ezber Durumları
+            </h2>
+            
+            <div class="ezber-section">
+                <div class="ezber-header">
+                    <h3>Elif Ba Ezberleri</h3>
+                    <button type="button" class="btn btn-secondary btn-sm" id="toggleAllElifBa">
+                        <i class="fas fa-eye"></i> Tüm Detayları Aç/Kapat
+                    </button>
+                </div>
+                
+                <div class="ezber-selector" id="elifBaSelector">
+                    {% for ezber in tum_elif_ba_ezberleri %}
+                    <div class="ezber-item" data-ezber-id="{{ ezber.id }}">
+                        <span style="margin-right: 5px; color: green;">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                        
+                        <label style="cursor: pointer; margin: 0; flex: 1;">
+                            {{ ezber.sira }}. {{ ezber.ad }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Elif Ba Ezber Detayları -->
+                <div class="ezber-detail-container compact-grid" id="elifBaDetailContainer">
+                    {% for ezber in tum_elif_ba_ezberleri %}
+                    <div class="ezber-detail-card compact" id="elif_ba_detail_{{ ezber.id }}">
+                        <div class="ezber-detail-header">
+                            <h4>{{ ezber.sira }}. {{ ezber.ad }} Detayları</h4>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleElifBaDetail('{{ ezber.id }}')">
+                                <i class="fas fa-times"></i> Kapat
+                            </button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tasks"></i> Durum
+                            </label>
+                            <select class="form-select" name="elif_ba_durum_{{ ezber.id }}" onchange="handleElifBaStatusChange('{{ ezber.id }}', this.value)">
+                                <option value="BASLAMADI" selected>Başlamadı</option>
+                                <option value="DEVAM">Devam Ediyor</option>
+                                <option value="TAMAMLANDI">Tamamlandı</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ezber-dates compact">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-plus"></i> Başlama
+                                </label>
+                                <input type="date" class="form-control" name="elif_ba_baslama_{{ ezber.id }}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-check"></i> Bitiş
+                                </label>
+                                <input type="date" class="form-control" name="elif_ba_bitis_{{ ezber.id }}">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-comment"></i> Yorum
+                            </label>
+                            <textarea class="form-control" name="elif_ba_yorum_{{ ezber.id }}" 
+                                      rows="2" placeholder="Ezber hakkında yorum..."></textarea>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- KAYDET BUTONU -->
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Tüm Verileri Kaydet
+                </button>
+                <a href="{% url 'ogrenci_listesi' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> İptal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('ogrenciForm');
+        
+        // Tüm ezber detaylarını açma/kapama
+        document.getElementById('toggleAllEzber').addEventListener('click', function() {
+            const allHidden = Array.from(document.querySelectorAll('#ezberDetailContainer .ezber-detail-card'))
+                .every(card => card.style.display === 'none');
+            
+            document.querySelectorAll('#ezberDetailContainer .ezber-detail-card').forEach(card => {
+                if (allHidden) {
+                    card.style.display = 'block';
+                    card.classList.add('active');
+                } else {
+                    card.style.display = 'none';
+                    card.classList.remove('active');
+                }
+            });
+        });
+        
+        // Tüm Elif Ba detaylarını açma/kapama
+        document.getElementById('toggleAllElifBa').addEventListener('click', function() {
+            const allHidden = Array.from(document.querySelectorAll('#elifBaDetailContainer .ezber-detail-card'))
+                .every(card => card.style.display === 'none');
+            
+            document.querySelectorAll('#elifBaDetailContainer .ezber-detail-card').forEach(card => {
+                if (allHidden) {
+                    card.style.display = 'block';
+                    card.classList.add('active');
+                } else {
+                    card.style.display = 'none';
+                    card.classList.remove('active');
+                }
+            });
+        });
+        
+        // Ezber detayını açma/kapama
+        window.toggleEzberDetail = function(ezberId) {
+            const detailCard = document.getElementById(`detail_${ezberId}`);
+            if (detailCard.style.display === 'none' || !detailCard.classList.contains('active')) {
+                detailCard.style.display = 'block';
+                detailCard.classList.add('active');
+            } else {
+                detailCard.style.display = 'none';
+                detailCard.classList.remove('active');
+            }
+        };
+        
+        // Elif Ba detayını açma/kapama
+        window.toggleElifBaDetail = function(ezberId) {
+            const detailCard = document.getElementById(`elif_ba_detail_${ezberId}`);
+            if (detailCard.style.display === 'none' || !detailCard.classList.contains('active')) {
+                detailCard.style.display = 'block';
+                detailCard.classList.add('active');
+            } else {
+                detailCard.style.display = 'none';
+                detailCard.classList.remove('active');
+            }
+        };
+        
+        // Ezber item'larına tıklama olayı ekle (detayları açmak için)
+        document.querySelectorAll('#ezberSelector .ezber-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const ezberId = this.getAttribute('data-ezber-id');
+                toggleEzberDetail(ezberId);
+            });
+        });
+        
+        // Elif Ba item'larına tıklama olayı ekle (detayları açmak için)
+        document.querySelectorAll('#elifBaSelector .ezber-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const ezberId = this.getAttribute('data-ezber-id');
+                toggleElifBaDetail(ezberId);
+            });
+        });
+        
+        // İlerleme çubuğunu güncelleme
+        window.updateProgress = function(ezberId, value) {
+            document.getElementById(`progressFill_${ezberId}`).style.width = value + '%';
+            document.getElementById(`progressPercentage_${ezberId}`).textContent = value + '%';
+            
+            // İlerleme %100 ise durumu otomatik olarak "Tamamlandı" yap
+            if (value == 100) {
+                document.querySelector(`select[name="ezber_durum_${ezberId}"]`).value = 'TAMAMLANDI';
+                handleEzberStatusChange(ezberId, 'TAMAMLANDI');
+            }
+            // İlerleme %0'dan büyükse durumu "Devam Ediyor" yap
+            else if (value > 0) {
+                document.querySelector(`select[name="ezber_durum_${ezberId}"]`).value = 'DEVAM';
+                handleEzberStatusChange(ezberId, 'DEVAM');
+            }
+            // İlerleme %0 ise durumu "Başlamadı" yap
+            else {
+                document.querySelector(`select[name="ezber_durum_${ezberId}"]`).value = 'BASLAMADI';
+            }
+        };
+        
+        // Elif Ba durum değişikliği handler
+        window.handleElifBaStatusChange = function(ezberId, durum) {
+            const today = new Date().toISOString().split('T')[0];
+            const baslamaInput = document.querySelector(`input[name="elif_ba_baslama_${ezberId}"]`);
+            const bitisInput = document.querySelector(`input[name="elif_ba_bitis_${ezberId}"]`);
+            
+            // Duruma göre otomatik tarih atama
+            if (durum === 'DEVAM') {
+                if (!baslamaInput.value) {
+                    baslamaInput.value = today;
+                    showStatusFeedback(baslamaInput.parentElement);
+                }
+            }
+            else if (durum === 'TAMAMLANDI') {
+                if (!bitisInput.value) {
+                    bitisInput.value = today;
+                    showStatusFeedback(bitisInput.parentElement);
+                }
+                if (!baslamaInput.value) {
+                    baslamaInput.value = today;
+                    showStatusFeedback(baslamaInput.parentElement);
+                }
+            }
+        };
+        
+        // Ezber durum değişikliği handler
+        window.handleEzberStatusChange = function(ezberId, durum) {
+            const today = new Date().toISOString().split('T')[0];
+            const baslamaInput = document.querySelector(`input[name="ezber_baslama_${ezberId}"]`);
+            const bitisInput = document.querySelector(`input[name="ezber_bitis_${ezberId}"]`);
+            
+            // Duruma göre otomatik tarih atama
+            if (durum === 'DEVAM') {
+                if (!baslamaInput.value) {
+                    baslamaInput.value = today;
+                    showStatusFeedback(baslamaInput.parentElement);
+                }
+            }
+            else if (durum === 'TAMAMLANDI') {
+                if (!bitisInput.value) {
+                    bitisInput.value = today;
+                    showStatusFeedback(bitisInput.parentElement);
+                }
+                if (!baslamaInput.value) {
+                    baslamaInput.value = today;
+                    showStatusFeedback(baslamaInput.parentElement);
+                }
+            }
+        };
+        
+        // Görsel feedback fonksiyonu
+        function showStatusFeedback(element) {
+            element.classList.add('status-updated');
+            setTimeout(() => {
+                element.classList.remove('status-updated');
+            }, 1000);
+        }
+        
+        // Sınav ekleme butonları
+        document.querySelectorAll('.sinav-ekle-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const dersId = this.getAttribute('data-ders-id');
+                const container = document.getElementById(`sinav-container-${dersId}`);
+                const mevcutSinavSayisi = container.querySelectorAll('.sinav-grup').length;
+                
+                if (mevcutSinavSayisi >= 3) {
+                    alert('En fazla 3 sınav ekleyebilirsiniz.');
+                    return;
+                }
+                
+                const yeniIndex = mevcutSinavSayisi + 1;
+                const yeniSinavHTML = `
+                    <div class="form-group sinav-grup" id="sinav-grup-${dersId}-${yeniIndex}">
+                        <label class="form-label">
+                            <i class="fas fa-file-alt"></i> ${yeniIndex}. Ek Sınav Puanı (0-100)
+                        </label>
+                        <div class="sinav-puan-input">
+                            <input type="number" class="form-control" name="sinav_puan_${dersId}_${yeniIndex}" 
+                                   min="0" max="100" value="" placeholder="Puan">
+                            <button type="button" class="sinav-kaldir-btn" data-ders-id="${dersId}" data-sinav-index="${yeniIndex}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', yeniSinavHTML);
+                
+                // Yeni eklenen sınav için kaldır butonuna event listener ekle
+                const yeniKaldirBtn = container.querySelector(`.sinav-kaldir-btn[data-sinav-index="${yeniIndex}"]`);
+                yeniKaldirBtn.addEventListener('click', function() {
+                    const sinavIndex = this.getAttribute('data-sinav-index');
+                    const sinavGrup = document.getElementById(`sinav-grup-${dersId}-${sinavIndex}`);
+                    sinavGrup.remove();
+                    
+                    // Sınav sayısını güncelle ve buton durumunu kontrol et
+                    const yeniMevcutSinavSayisi = container.querySelectorAll('.sinav-grup').length;
+                    if (yeniMevcutSinavSayisi < 3) {
+                        document.querySelector(`.sinav-ekle-btn[data-ders-id="${dersId}"]`).disabled = false;
+                    }
+                });
+                
+                // 3 sınav olduğunda butonu devre dışı bırak
+                if (yeniIndex >= 3) {
+                    this.disabled = true;
+                }
+            });
+        });
+        
+        // Form doğrulama
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            // Gerekli alanları kontrol et
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = '#e74a3b';
+                    
+                    if (!field.nextElementSibling || !field.nextElementSibling.classList.contains('error-message')) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message';
+                        errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Bu alan zorunludur';
+                        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                    }
+                } else {
+                    field.style.borderColor = '';
+                    
+                    if (field.nextElementSibling && field.nextElementSibling.classList.contains('error-message')) {
+                        field.nextElementSibling.remove();
+                    }
+                }
+            });
+            
+            // Sayı inputlarını sınırla (0-100)
+            const numberInputs = form.querySelectorAll('input[type="number"]');
+            numberInputs.forEach(input => {
+                if (input.value < 0) input.value = 0;
+                if (input.value > 100) input.value = 100;
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                // İlk hatalı alana odaklan
+                const firstError = form.querySelector('[required]:invalid');
+                if (firstError) {
+                    firstError.focus();
+                }
+                
+                // Hata mesajı göster
+                alert('Lütfen tüm zorunlu alanları doldurun!');
+            }
+        });
+    });
+</script>
+{% endblock %}

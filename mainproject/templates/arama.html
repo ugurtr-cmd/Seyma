@@ -1,0 +1,92 @@
+<!-- your_app/templates/search.html -->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>ŞEYMA</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .logo {
+      font-size: 48px;
+      font-weight: bold;
+      color: #5e35b1;
+      margin-bottom: 40px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      font-size: 18px;
+      border: 2px solid #ccc;
+      border-radius: 30px;
+      outline: none;
+      transition: 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #5e35b1;
+    }
+
+    button {
+      padding: 10px 30px;
+      font-size: 16px;
+      background-color: #5e35b1;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #4527a0;
+    }
+
+    .result {
+      margin-top: 40px;
+      width: 90%;
+      max-width: 700px;
+      font-size: 18px;
+      line-height: 1.6;
+      white-space: pre-line;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">ŞEYMA</div>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="text" name="query" placeholder="Bir şey sor..." required>
+    <button type="submit">Ara</button>
+  </form>
+
+  {% if result %}
+    <div class="result">{{ result }}</div>
+  {% endif %}
+
+</body>
+</html>

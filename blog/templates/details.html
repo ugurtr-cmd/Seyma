@@ -1,0 +1,347 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}{{yazilar.title}} | Şeyma {% endblock title %} 
+{% block css_file %} 
+<link rel="stylesheet" href="{% static 'mainproject/css/style.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Özel Stiller */
+    .article-header {
+        text-align: center;
+        padding: 3rem 0;
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        color: white;
+        margin-bottom: 2rem;
+        border-radius: 0 0 30px 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .article-title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .article-meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .article-meta i {
+        margin-right: 5px;
+        color: #f72585;
+    }
+    
+    .article-image {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        margin: 2rem 0;
+    }
+    
+    .article-content {
+        font-size: 1.2rem;
+        line-height: 1.9;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.8rem;
+    }
+    
+    .article-content blockquote {
+        border-left: 4px solid #4361ee;
+        padding: 1.5rem 2rem;
+        background: #f8f9ff;
+        margin: 2rem 0;
+        font-style: italic;
+        font-size: 1.3rem;
+        border-radius: 0 10px 10px 0;
+    }
+    
+    .social-sharing {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 3rem 0;
+    }
+    
+    .social-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-decoration: none;
+    }
+    
+    .social-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    
+    .link-btn {
+        background-color: #6c757d;
+        position: relative;
+    }
+    
+    .tooltip {
+        visibility: hidden;
+        width: 120px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.8rem;
+    }
+    
+    .tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+    }
+    
+    .link-btn:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    .recommended-section {
+        background: linear-gradient(to bottom, #f8f9ff, #ffffff);
+        padding: 4rem 0;
+        margin-top: 3rem;
+    }
+    
+    .section-title {
+        text-align: center;
+        font-size: 2.2rem;
+        margin-bottom: 3rem;
+        color: #3a0ca3;
+        position: relative;
+    }
+    
+    .section-title:after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background: #f72585;
+        margin: 10px auto;
+        border-radius: 2px;
+    }
+    
+    .recommended-card {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        transition: all 0.4s ease;
+        height: 100%;
+        background: white;
+    }
+    
+    .recommended-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .recommended-image {
+        height: 220px;
+        width: 100%;
+        object-fit: cover;
+    }
+    
+    .recommended-body {
+        padding: 1.5rem;
+    }
+    
+    .recommended-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+        color: #2b2d42;
+    }
+    
+    .recommended-excerpt {
+        color: #666;
+        margin-bottom: 1.2rem;
+    }
+    
+    .recommended-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .read-more-btn {
+        display: inline-block;
+        padding: 8px 20px;
+        background: #4361ee;
+        color: white;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .read-more-btn:hover {
+        background: #3a0ca3;
+        transform: translateY(-3px);
+    }
+.whatsapp { background-color: #25d366; }
+.instagram { 
+    background: #f09433; 
+    background: -moz-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
+    background: -webkit-linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
+    background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); 
+}
+    @media (max-width: 768px) {
+        .article-title {
+            font-size: 2rem;
+        }
+        
+        .article-image {
+            height: 300px;
+        }
+        
+        .article-meta {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+</style>
+{% endblock css_file %}
+
+{% block content %}
+
+<!-- Yazı Başlık Bölümü -->
+<div class="article-header">
+    <div class="container">
+        <h1 class="article-title">{{yazilar.title}}</h1>
+        <div class="article-meta">
+            <span><i class="far fa-calendar"></i> {{ yazilar.tarih|date:"d M Y" }}</span>
+            <span><i class="far fa-clock"></i> {{ okuma_suresi }} dk okuma</span>
+        </div>
+    </div>
+</div>
+
+<!-- Yazı İçeriği -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            {% if yazilar.imageUrl %}
+                <img 
+                    src="{{ yazilar.imageUrl.url }}" 
+                    class="article-image"
+                    alt="{{ yazilar.title }}"
+                >
+            {% endif %}
+            
+            <div class="article-content">
+                {{yazilar.description|safe}}
+            </div>
+            
+            <!-- Sosyal Paylaşım Butonları -->
+<div class="social-sharing">
+    <!-- WhatsApp Paylaşım -->
+    <a href="https://wa.me/?text={{ yazilar.title|urlencode }}%20-%20{{ request.build_absolute_uri|urlencode }}" 
+       target="_blank" 
+       class="social-btn whatsapp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    
+    <!-- Instagram Paylaşım -->
+    <a href="https://www.instagram.com/create/story?text={{ yazilar.title|urlencode }}&url={{ request.build_absolute_uri|urlencode }}" 
+       target="_blank" 
+       class="social-btn instagram">
+        <i class="fab fa-instagram"></i>
+    </a>
+    
+    <!-- Link Kopyala -->
+    <a href="#" class="social-btn link-btn" id="copy-link-btn">
+        <i class="fas fa-link"></i>
+        <span class="tooltip">Kopyalandı!</span>
+    </a>
+</div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    // Link kopyalama fonksiyonu
+    document.getElementById('copy-link-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Mevcut URL'yi kopyala
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            // Tooltip'i göster
+            const tooltip = this.querySelector('.tooltip');
+            tooltip.style.visibility = 'visible';
+            tooltip.style.opacity = '1';
+            
+            // 2 saniye sonra tooltip'i gizle
+            setTimeout(() => {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.opacity = '0';
+            }, 2000);
+        });
+    });
+
+    // Yazı modeli için okuma süresi hesaplama
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tüm yazılar için okuma süresini hesapla ve güncelle
+        {% for benzer in benzer_yazilar %}
+            calculateReadingTime('{{ benzer.description|escapejs }}', '{{ benzer.id }}');
+        {% endfor %}
+    });
+
+    function calculateReadingTime(content, id) {
+        // HTML etiketlerini temizle
+        const strippedContent = content.replace(/<[^>]*>/g, '');
+        // Kelime sayısını hesapla
+        const wordCount = strippedContent.trim().split(/\s+/).length;
+        // Dakika cinsinden okuma süresi (200 kelime/dk)
+        const readingTime = Math.ceil(wordCount / 200);
+        
+        // DOM'da güncelleme yap
+        const element = document.querySelector(`.recommended-card[data-id="${id}"] .reading-time`);
+        if (element) {
+            element.textContent = `${readingTime} dk`;
+        }
+    }
+</script>
+
+{% endblock content %}

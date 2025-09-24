@@ -1,0 +1,35 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">{% endblock css_file %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h5>Öğrenci Silme Onayı</h5>
+        </div>
+        <div class="card-body">
+            <p class="lead">Aşağıdaki öğrenciyi silmek istediğinize emin misiniz?</p>
+            
+            <div class="alert alert-warning">
+                <strong>{{ ogrenci.ad_soyad }}</strong><br>
+                Seviye: {{ ogrenci.get_seviye_display }}<br>
+                Kayıt Tarihi: {{ ogrenci.kayit_tarihi|date:"d/m/Y" }}
+            </div>
+            
+            <form method="POST" action="{% url 'ogrenci_sil' ogrenci.id %}">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'ogrenci_listesi' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Vazgeç
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Sil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

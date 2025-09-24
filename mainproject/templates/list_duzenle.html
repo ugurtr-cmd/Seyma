@@ -1,0 +1,277 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Yazı Güncelle | Şeyma{% endblock title %}
+
+{% block css_file %}
+<style>
+  :root {
+    --primary-color: #6c5ce7;
+    --primary-light: #a29bfe;
+    --primary-dark: #5649c9;
+    --text-dark: #2d3436;
+    --text-light: #636e72;
+    --bg-light: #f8f9fa;
+    --success: #00b894;
+    --danger: #d63031;
+    --warning: #fdcb6e;
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+    --shadow: 0 5px 25px rgba(0,0,0,0.08);
+  }
+  
+  .main-content {
+    padding: 2rem;
+  }
+  
+  .section-box {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+  }
+  
+  .section-header {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--bg-light);
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-control, .form-select {
+    border-radius: var(--border-radius);
+    border: 2px solid #e9ecef;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+  }
+  
+  .current-image {
+    margin-top: 1rem;
+    max-width: 300px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  
+  .current-image img {
+    width: 100%;
+    height: auto;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: var(--transition);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+  }
+  
+  .btn-secondary {
+    background: #f8f9fa;
+    color: var(--text-dark);
+    border: 1px solid #dee2e6;
+    border-radius: var(--border-radius);
+    padding: 1rem 2rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: var(--transition);
+  }
+  
+  .btn-secondary:hover {
+    background: #e9ecef;
+  }
+  
+  /* CKEditor Stili */
+  .cke_chrome {
+    border-radius: var(--border-radius) !important;
+    border: 2px solid #e9ecef !important;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  
+  .cke_top {
+    border-bottom: 1px solid #e9ecef !important;
+    background: #f8f9fa !important;
+  }
+  
+  .cke_bottom {
+    border-top: 1px solid #e9ecef !important;
+    background: #f8f9fa !important;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .main-content {
+      padding: 1.5rem;
+    }
+    
+    .section-box {
+      padding: 2rem;
+    }
+    
+    .section-header {
+      font-size: 1.3rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .main-content {
+      padding: 1rem;
+    }
+    
+    .section-box {
+      padding: 1.5rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+      width: 100%;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .button-group {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock css_file %}
+
+{% block content %}
+<div class="main-content">
+  <div class="section-box">
+    <div class="section-header">
+      <i class="fas fa-edit"></i> Yazıyı Düzenle
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <!-- Başlık -->
+      <div class="mb-4">
+        <label for="baslik" class="form-label">
+          <i class="fas fa-heading"></i> Başlık
+        </label>
+        <input type="text" class="form-control" name="baslik" id="baslik" value="{{ yazi.title }}" required>
+      </div>
+
+      <!-- Kategori -->
+      <div class="mb-4">
+        <label for="kategori" class="form-label">
+          <i class="fas fa-folder"></i> Kategori
+        </label>
+        <select name="kategori" class="form-select" id="kategori" required>
+          <option value="">Kategori Seçin</option>
+          {% for kategori in kategoriler %}
+            <option value="{{ kategori.id }}" {% if yazi.category.id == kategori.id %}selected{% endif %}>
+              {{ kategori.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- İçerik -->
+      <div class="mb-4">
+        <label for="editor" class="form-label">
+          <i class="fas fa-file-alt"></i> İçerik
+        </label>
+        <textarea class="form-control" name="description" id="editor" rows="8">{{ yazi.description }}</textarea>
+      </div>
+
+      <!-- Resim yükleme alanı -->
+      <div class="mb-4">
+        <label for="image" class="form-label">
+          <i class="fas fa-image"></i> Resim
+        </label>
+        <input type="file" class="form-control" name="image" id="image" accept="image/*">
+        <div class="form-text">JPEG, PNG veya JPG formatında yükleyin</div>
+        
+        {% if yazi.imageUrl %}
+          <div class="current-image mt-3">
+            <label class="form-label">
+              <i class="fas fa-image me-2"></i>Mevcut Resim
+            </label>
+            <img src="{{ yazi.imageUrl.url }}" alt="Current image" class="img-fluid">
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Aktiflik Durumu -->
+      <div class="mb-4">
+        <label for="aktif" class="form-label">
+          <i class="fas fa-eye"></i> Yayın Durumu
+        </label>
+        <select name="aktif" class="form-select" id="aktif">
+          <option value="True" {% if yazi.isActive %}selected{% endif %}>Yayında</option>
+          <option value="False" {% if not yazi.isActive %}selected{% endif %}>Taslak</option>
+        </select>
+      </div>
+
+      <!-- Butonlar -->
+      <div class="button-group d-flex gap-3">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-2"></i> Değişiklikleri Kaydet
+        </button>
+        <a href="{% url 'admin-yazi-listesi' %}" class="btn btn-secondary">
+          <i class="fas fa-times me-2"></i> İptal
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- CKEditor -->
+<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+<script>
+  // CKEditor konfigürasyonu
+  CKEDITOR.replace('editor', {
+    height: 400,
+    toolbar: [
+      { name: 'document', items: ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates'] },
+      { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+      { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt'] },
+      { name: 'forms', items: ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField'] },
+      '/',
+      { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'CopyFormatting', 'RemoveFormat'] },
+      { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language'] },
+      { name: 'links', items: ['Link', 'Unlink', 'Anchor'] },
+      { name: 'insert', items: ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe'] },
+      '/',
+      { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+      { name: 'colors', items: ['TextColor', 'BGColor'] },
+      { name: 'tools', items: ['Maximize', 'ShowBlocks'] },
+      { name: 'about', items: ['About'] }
+    ],
+    extraPlugins: 'colorbutton,font',
+    removeButtons: 'PasteFromWord'
+  });
+</script>
+{% endblock content %}

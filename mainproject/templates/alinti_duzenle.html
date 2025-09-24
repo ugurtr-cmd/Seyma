@@ -1,0 +1,353 @@
+{% extends "layout_admin.html" %}
+{% load static %}
+
+{% block title %}Alıntı Düzenle | Şeyma{% endblock title %} 
+
+{% block css_file %}
+<style>
+  .main-content {
+    padding: 2rem;
+  }
+  
+  .section-box {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+  }
+  
+  .section-box h4 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-control, .form-select, .form-textarea {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    transition: var(--transition);
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .form-control:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
+  }
+  
+  .form-textarea {
+    min-height: 150px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+  
+  .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 1.5rem 0;
+  }
+  
+  .form-check-input {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+  }
+  
+  .form-check-label {
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: var(--transition);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(78, 115, 223, 0.3);
+  }
+  
+  .btn-secondary {
+    background: #6c757d;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: var(--transition);
+  }
+  
+  .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+  }
+  
+  .alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .alert-danger {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+  }
+  
+  .alert-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+  }
+  
+  .quote-preview {
+    background: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    font-style: italic;
+    color: var(--text-dark);
+    line-height: 1.7;
+  }
+  
+  .author-input {
+    max-width: 300px;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .meta-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+  }
+  
+  .meta-item {
+    color: #262323ff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .main-content {
+      padding: 1.5rem;
+    }
+    
+    .section-box {
+      padding: 2rem;
+    }
+    
+    .section-box h4 {
+      font-size: 1.3rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .btn-primary, .btn-secondary {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .main-content {
+      padding: 1rem;
+    }
+    
+    .section-box {
+      padding: 1.5rem;
+    }
+    
+    .author-input {
+      max-width: 100%;
+    }
+  }
+</style>
+{% endblock css_file %}
+
+{% block content %}
+<!-- Alıntı Düzenleme Alanı -->
+<div class="section-box">
+  <h4><i class="fas fa-edit"></i> Alıntıyı Düzenle</h4>
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  <form method="POST">
+    {% csrf_token %}
+    
+    <!-- Alıntı Metni -->
+    <div class="mb-4">
+      <label for="quote_text" class="form-label">
+        <i class="fas fa-pen"></i> Alıntı Metni
+      </label>
+      <textarea class="form-control form-textarea" name="quote_text" id="quote_text" rows="6" 
+                placeholder="Alıntı metnini buraya yazın..." required>{{ alinti.quote_text }}</textarea>
+    </div>
+    
+    <!-- Yazar -->
+    <div class="mb-4">
+      <label for="author" class="form-label">
+        <i class="fas fa-user"></i> Yazar
+      </label>
+      <input type="text" name="author" class="form-control author-input" id="author" 
+             placeholder="Yazar adı (isteğe bağlı)" value="{{ alinti.author|default:'' }}">
+    </div>
+    
+    <!-- Kaynak -->
+    <div class="mb-4">
+      <label for="source" class="form-label">
+        <i class="fas fa-book"></i> Kaynak
+      </label>
+      <input type="text" name="source" class="form-control" id="source" 
+             placeholder="Kitap, makale vs. (isteğe bağlı)" value="{{ alinti.source|default:'' }}">
+    </div>
+    
+    <!-- Kategori -->
+    <div class="mb-4">
+      <label for="category" class="form-label">
+        <i class="fas fa-folder"></i> Kategori
+      </label>
+      <select name="category" class="form-select" id="category">
+        <option value="">Kategori seçin</option>
+        <option value="dini" {% if alinti.category == 'dini' %}selected{% endif %}>Dini</option>
+        <option value="edebi" {% if alinti.category == 'edebi' %}selected{% endif %}>Edebi</option>
+        <option value="felsefi" {% if alinti.category == 'felsefi' %}selected{% endif %}>Felsefi</option>
+        <option value="siir" {% if alinti.category == 'siir' %}selected{% endif %}>Şiir</option>
+        <option value="motivasyon" {% if alinti.category == 'motivasyon' %}selected{% endif %}>Motivasyon</option>
+        <option value="bilim" {% if alinti.category == 'bilim' %}selected{% endif %}>Bilim</option>
+      </select>
+    </div>
+    
+    
+    <!-- Aktiflik -->
+<!-- Aktiflik -->
+    <div class="form-check form-switch mb-4">
+        <input type="checkbox" name="isActive" class="form-check-input" id="isActive" 
+            value="on" {% if alinti.isActive %}checked{% endif %}>
+        <label for="isActive" class="form-check-label">
+            <i class="fas fa-eye"></i> Yayında göster
+        </label>
+    </div>
+    
+    <!-- Önizleme -->
+    <div class="quote-preview">
+      <h5><i class="fas fa-eye me-2"></i>Önizleme</h5>
+      <div id="preview-content">{{ alinti.quote_text }}</div>
+      {% if alinti.author %}
+      <div id="preview-author" class="mt-2 text-end fw-bold">- {{ alinti.author }}</div>
+      {% else %}
+      <div id="preview-author" class="mt-2 text-end fw-bold" style="display: none;"></div>
+      {% endif %}
+    </div>
+    
+    <!-- Meta Bilgiler -->
+    <div class="meta-info">
+      <div class="meta-item">
+        <i class="fas fa-calendar"></i>
+        <span>Oluşturulma: {{ alinti.created_at|date:"d.m.Y H:i" }}</span>
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-sync-alt"></i>
+        <span>Son düzenleme: {% now "d.m.Y H:i" %}</span>
+      </div>
+      {% if alinti.category %}
+      <div class="meta-item">
+        <i class="fas fa-folder"></i>
+        <span>Kategori: {{ alinti.category }}</span>
+      </div>
+      {% endif %}
+    </div>
+    
+    <!-- İşlem Butonları -->
+    <div class="action-buttons">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-2"></i> Değişiklikleri Kaydet
+      </button>
+      <a href="{% url 'alinti-listesi' %}" class="btn btn-secondary">
+        <i class="fas fa-times me-2"></i> İptal
+      </a>
+      <a href="{% url 'alinti-sil' alinti.id %}" class="btn btn-outline-danger">
+        <i class="fas fa-trash me-2"></i> Alıntıyı Sil
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const quoteText = document.getElementById('quote_text');
+  const authorInput = document.getElementById('author');
+  const previewContent = document.getElementById('preview-content');
+  const previewAuthor = document.getElementById('preview-author');
+  
+  // Gerçek zamanlı önizleme
+  function updatePreview() {
+    previewContent.textContent = quoteText.value || 'Alıntı metni burada görünecek...';
+    
+    if (authorInput.value) {
+      previewAuthor.textContent = `- ${authorInput.value}`;
+      previewAuthor.style.display = 'block';
+    } else {
+      previewAuthor.style.display = 'none';
+    }
+  }
+  
+  quoteText.addEventListener('input', updatePreview);
+  authorInput.addEventListener('input', updatePreview);
+  
+  // Sayfa yüklendiğinde önizlemeyi güncelle
+  updatePreview();
+  
+  // Form gönderiminde kontrol
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(e) {
+    if (!quoteText.value.trim()) {
+      e.preventDefault();
+      alert('Alıntı metni boş olamaz!');
+      quoteText.focus();
+    }
+  });
+});
+</script>
+{% endblock content %}
