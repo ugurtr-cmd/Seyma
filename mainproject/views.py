@@ -62,9 +62,7 @@ restore_progress = {
 @login_required(login_url='login')
 def restore_data(request):
     global restore_progress
-    """
-    Geri yükleme sayfasını gösterir veya işlemi başlatır
-    """
+    
     if request.method == 'GET':
         # GET isteği için yedek listesini göster
         backup_dir = os.path.join(settings.MEDIA_ROOT, 'backups')
@@ -89,40 +87,58 @@ def restore_data(request):
         return render(request, 'restore_data.html', {
             'backups': backups,
             'restore_progress': restore_progress
-        })
-    
-    # POST isteği için geri yükleme işlemini başlat
-    
+        })  
+      
+    # POST isteği
     if 'backup_file' not in request.FILES:
         messages.error(request, 'Lütfen bir yedek dosyası seçin.')
         return redirect('restore_data')
     
     backup_file = request.FILES['backup_file']
     
-    # İlerleme durumunu sıfırla
+    # HEMEN ilerleme durumunu güncelle (timeout'u önlemek için)
     restore_progress = {
-        'status': 'started',
-        'progress': 0,
-        'message': 'Yedek dosyası işleniyor...'
+        'status': 'started', 
+        'progress': 5,
+        'message': 'Dosya alınıyor...'
     }
     
     try:
-        # Geçici dosyayı kaydet
+        # Dosyayı HIZLICA kaydet
         temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_restore')
         os.makedirs(temp_dir, exist_ok=True)
         
-        zip_path = os.path.join(temp_dir, 'backup.zip')
+        zip_path = os.path.join(temp_dir, f'backup_{int(time.time())}.zip')
+        
+        # Chunk boyutunu küçült ve hızlı yaz
         with open(zip_path, 'wb+') as destination:
-            for chunk in backup_file.chunks():
+            for chunk in backup_file.chunks(8192):  # 8KB chunk
                 destination.write(chunk)
         
-        # HATA DÜZELTME: Thread yerine doğrudan işlemi başlat
-        # Arka planda geri yükleme işlemini başlat
+        # HEMEN ilerlemeyi güncelle
+        restore_progress = {
+            'status': 'processing',
+            'progress': 15, 
+            'message': 'Dosya kaydedildi, işlem başlatılıyor...'
+        }
+        
+        # Thread YERİNE doğrudan işlem - Render'da daha güvenli
         try:
             restore_backup_process(zip_path)
-            messages.success(request, 'Geri yükleme işlemi başarıyla tamamlandı!')
+            
+            if restore_progress['status'] == 'error':
+                messages.error(request, f"Geri yükleme hatası: {restore_progress['message']}")
+            else:
+                messages.success(request, 'Geri yükleme başarıyla tamamlandı!')
+                
         except Exception as e:
-            messages.error(request, f'Geri yükleme sırasında hata oluştu: {str(e)}')
+            error_msg = f"Geri yükleme işlemi sırasında hata: {str(e)}"
+            restore_progress = {
+                'status': 'error',
+                'progress': 0,
+                'message': error_msg
+            }
+            messages.error(request, error_msg)
         
         return redirect('restore_data')
         
@@ -130,9 +146,9 @@ def restore_data(request):
         restore_progress = {
             'status': 'error',
             'progress': 0,
-            'message': f'Hata: {str(e)}'
+            'message': f'Dosya işleme hatası: {str(e)}'
         }
-        messages.error(request, f'Geri yükleme başlatılamadı: {str(e)}')
+        messages.error(request, f'Dosya işlenirken hata: {str(e)}')
         return redirect('restore_data')
 
 def restore_backup_process(zip_path):
